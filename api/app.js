@@ -2,6 +2,23 @@ const express = require('express');
 const app = express();
 const routeAnuncios = require('./routes/anuncios');
 
+app.use(express.urlencoded({extended: false}));//Aceita apenas dados simples
+app.use(express.json());//Aceita Apenas json
+
+//Configuração CORS
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header(
+        'Access-Control-Allow-Header', 
+        'Origin , X-Requested-Width, Content-Type, Accept, Authorization'
+    );
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+        return res.status(200).send({});
+    }
+    next();
+});
+
 app.use('/anuncios', routeAnuncios);
 
 app.use((req, res, next) => {
