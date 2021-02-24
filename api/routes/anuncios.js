@@ -1,10 +1,25 @@
 const express = require("express");
+const mysql = require("../mysql").pool;
+
 const router = express.Router();
 
 //Retorna lista de anúncios
 router.get("/", (req, res, next) => {
-  res.status(200).send({
-    mensagem: "Lista de anúncios",
+  mysql.getConnection((error, conn) => {
+    conn.query("select * from tb_anuncios", (error, result, field) => {
+      if (!error === null) {
+        res.status(500).send({
+          error: {
+            code: error.code,
+            errno: error.errno,
+          },
+        });
+      } else {
+        res.status(200).send({
+          response: result,
+        });
+      }
+    });
   });
 });
 
