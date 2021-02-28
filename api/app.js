@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
-const routeAnuncios = require('./routes/anuncios');
+const morgan = require('morgan');
+const routeAdmin = require('./routes/admin');
+
+app.use(morgan('dev'));
 
 app.use(express.urlencoded({extended: false}));//Aceita apenas dados simples
 app.use(express.json());//Aceita Apenas json
@@ -19,7 +22,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/anuncios', routeAnuncios);
+app.use('/admin', routeAdmin);
 
 app.use((req, res, next) => {
     const erro = new Error('Rota não encontrada');

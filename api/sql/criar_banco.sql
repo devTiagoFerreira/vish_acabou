@@ -1,8 +1,8 @@
-create database db_vish_acabou;
+create database bd_vish_acabou;
 
-use db_vish_acabou;
+use bd_vish_acabou;
 
-alter database db_vish_acabou charset = utf8mb4 collate = utf8mb4_bin;
+alter database bd_vish_acabou charset = utf8mb4 collate = utf8mb4_bin;
 
 create table tb_status_cliente (
 	id int auto_increment not null primary key,
@@ -10,7 +10,7 @@ create table tb_status_cliente (
 );
 
 create table tb_clientes (
-id int not null primary key,
+id int auto_increment not null primary key,
 email varchar(50) not null unique,
 senha varchar(100) not null,
 foto varchar(100),
@@ -212,4 +212,16 @@ create table tb_social_empresa (
     foreign key (id_rede_social) references tb_redes_sociais (id)
 );
 
+create table tb_admin (
+	id int auto_increment not null primary key,
+	email varchar(50) not null unique,
+	senha varchar(100) not null,
+	foto varchar(100),
+	nome varchar(50) not null,
+	sobrenome varchar(100) not null,
+	data_nasc date,
+	data_cadastro datetime default current_timestamp not null
+);
+
+insert into tb_admin values (0, 'vishacabou@gmail.com', '$2b$10$u2B/H3hE5t83I2YiPnev5.Sw64suNR92sbFEd6mYrrx4Ub3kJuNMa', 'img\\admins\\2021-02-28T18-00-19.212Z-admin.webp', 'Tiago', 'C. Ferreira', '1988-01-26', default);
 
