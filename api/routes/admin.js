@@ -5,10 +5,16 @@ const mysql = require("../mysql").pool;
 
 const bcrypt = require("bcrypt");
 
+const jwt = require("jsonwebtoken");
+
+const auth = require("../middleware/auth");
+
+require("dotenv").config();
+
 const multer = require("multer");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./img/admins");
+    cb(null, "./img/anuncios");
   },
   filename: (req, file, cb) => {
     cb(
@@ -28,9 +34,9 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 1024 * 1024 * 5,
+    fileSize: 1024 * 1024,
   },
-}).single("foto");
+}).single("banner");
 
 //Login
 router.post("/login", (req, res, next) => {
@@ -81,11 +87,32 @@ router.post("/login", (req, res, next) => {
               },
             });
           }
-          res.status(200).send({
-            resposta: {
-              mensagem: "Autenticação bem-sucedida",
-            },
-          });
+          const token = {
+            idUsuario: results[0].id,
+            email: results[0].email,
+            nome: results[0].nome,
+          };
+          jwt.sign(
+            token,
+            process.env.SECRET_KEY,
+            { expiresIn: 1000 * 30 },
+            (err, token) => {
+              if (err) {
+                return res.status(401).send({
+                  erro: {
+                    mensagem: "Falha na autenticação",
+                    motivo: "Falha na geração do token",
+                  },
+                });
+              }
+              return res.status(200).send({
+                resposta: {
+                  mensagem: "Autenticação bem-sucedida",
+                  token: token,
+                },
+              });
+            }
+          );
         });
       }
     );
@@ -93,7 +120,7 @@ router.post("/login", (req, res, next) => {
 });
 
 //Registro de anúncios
-router.post("/anuncios", (req, res, next) => {
+router.post("/anuncios", auth.optionalAuth, (req, res, next) => {
   upload(req, res, (error) => {
     console.log(req.file);
     if (!req.file) {
