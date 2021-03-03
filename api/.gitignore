@@ -4,5 +4,8 @@ node_modules/
 #Env
 .env
 
+#imagens
+img/admins/*
+img/anuncios/*
 
 

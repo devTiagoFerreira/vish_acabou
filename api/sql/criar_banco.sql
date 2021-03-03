@@ -10,24 +10,24 @@ create table tb_status_cliente (
 );
 
 create table tb_clientes (
-id int auto_increment not null primary key,
-email varchar(50) not null unique,
-senha varchar(100) not null,
-foto varchar(100),
-nome varchar(50) not null,
-sobrenome varchar(100) not null,
-data_nasc date,
-genero varchar(30),
-cep varchar(9) not null,
-logradouro varchar(100) not null,
-numero varchar(10) not null,
-bairro varchar(50) not null,
-complemento varchar(50),
-cidade varchar(50) not null,
-estado varchar(20) not null,
-data_cadastro datetime default current_timestamp not null,
-id_status_cliente int default 1 not null,
-foreign key (id_status_cliente) references tb_status_cliente (id)
+    id int auto_increment not null primary key,
+    email varchar(50) not null unique,
+    senha varchar(100) not null,
+    foto varchar(100),
+    nome varchar(50) not null,
+    sobrenome varchar(100) not null,
+    data_nasc date,
+    genero varchar(30),
+    cep varchar(9) not null,
+    logradouro varchar(100) not null,
+    numero varchar(10) not null,
+    bairro varchar(50) not null,
+    complemento varchar(50),
+    cidade varchar(50) not null,
+    estado varchar(20) not null,
+    data_cadastro datetime default current_timestamp not null,
+    id_status_cliente int default 1 not null,
+    foreign key (id_status_cliente) references tb_status_cliente (id)
 );
 
 create table tb_status_amigo (
@@ -222,6 +222,3 @@ create table tb_admin (
 	data_nasc date,
 	data_cadastro datetime default current_timestamp not null
 );
-
-insert into tb_admin values (0, 'vishacabou@gmail.com', '$2b$10$u2B/H3hE5t83I2YiPnev5.Sw64suNR92sbFEd6mYrrx4Ub3kJuNMa', 'img\\admins\\2021-02-28T18-00-19.212Z-admin.webp', 'Tiago', 'C. Ferreira', '1988-01-26', default);
-
