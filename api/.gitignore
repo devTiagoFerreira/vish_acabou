@@ -5,7 +5,7 @@ node_modules/
 .env
 
 #imagens
-img/admins/*
-img/anuncios/*
+img/
+
 
 

@@ -222,3 +222,19 @@ create table tb_admin (
 	data_nasc date,
 	data_cadastro datetime default current_timestamp not null
 );
+
+create table tb_estados (
+	id int auto_increment primary key,
+    sigla char(2) not null unique,
+    nome varchar(20) not null unique
+);
+
+create table tb_cidades_empresas (
+	id int auto_increment primary key,
+    id_estado int not null,
+    nome varchar(100) not null unique,
+    foreign key (id_estado) references tb_estados (id)
+);
+
+
+

@@ -6,4 +6,9 @@ const auth = require('../middleware/auth');
 //Login
 router.post('/login', admin.login);
 
+//Cidades
+router.post('/estados', auth.optionalAuth, admin.estadosPOST);
+
+router.patch('/estados', auth.optionalAuth, admin.estadosPATCH);
+
 module.exports = router;
