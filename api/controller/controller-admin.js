@@ -156,10 +156,10 @@ exports.estadosPOST = (req, res, next) => {
 
 //States PATCH
 exports.estadosPATCH = (req, res, next) => {
-    const id_estado = req.body.id_estado || null;
-    const sigla = req.body.sigla || null
+    const id_estado = req.params.id_estado;
+    const sigla = req.body.sigla || null;
     const nome = req.body.nome || null;
-    if (!sigla || !nome || !id_estado) {
+    if (!sigla || !nome) {
         return res.status(400).send({
             erro: {
                 mensagem: 'Campo não definido ou vazio',
@@ -192,31 +192,55 @@ exports.estadosPATCH = (req, res, next) => {
         });
     }
     mysql
-        .poolConnect('select sigla, nome from tb_estados where sigla = ? or nome = ?', [sigla, nome])
+        .poolConnect('select id from tb_estados where id = ?', [id_estado])
         .then((results) => {
-            if (results.length > 0) {
+            if (!results.length > 0) {
                 return res.status(422).send({
                     erro: {
-                        mensagem: 'Estado já cadastrado',
-                        estado: results,
+                        mensagem: 'Id inválido',
                     },
                 });
             }
-            mysql.poolConnect('insert into tb_estados values (0, ?, ?)', [sigla, nome]).then(() => {
-                return res
-                    .status(200)
-                    .send({
-                        resposta: {
-                            Mensagem: 'Cadastro efetuado com sucesso!',
-                            estado: { sigla: sigla, nome: nome },
-                        },
-                    })
-                    .catch((error) => {
-                        return res.status(500).send({
-                            erro: error,
+            mysql
+                .poolConnect('select * from tb_estados where sigla = ? or nome = ?', [sigla, nome])
+                .then((results) => {
+                    if (results.length > 0) {
+                        let estado = [];
+                        results.forEach((row) => {
+                            if (row.id != id_estado) {
+                                estado.push(row);
+                            }
                         });
+                        if (!estado.length == 0) {
+                            return res.status(422).send({
+                                erro: {
+                                    mensagem: 'Estado já cadastrado',
+                                    estado: estado,
+                                },
+                            });
+                        }
+                    }
+                    mysql.poolConnect('update tb_estados set sigla = ?, nome = ? where id = ?;', [sigla, nome, id_estado]).then(() => {
+                        return res
+                            .status(200)
+                            .send({
+                                resposta: {
+                                    Mensagem: 'Estado atualizado com sucesso!',
+                                    estado: { id: id_estado, sigla: sigla, nome: nome },
+                                },
+                            })
+                            .catch((error) => {
+                                return res.status(500).send({
+                                    erro: error,
+                                });
+                            });
                     });
-            });
+                })
+                .catch((error) => {
+                    return res.status(500).send({
+                        erro: error,
+                    });
+                });
         })
         .catch((error) => {
             return res.status(500).send({
