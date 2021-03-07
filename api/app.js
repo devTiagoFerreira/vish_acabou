@@ -3,6 +3,8 @@ const app = express();
 const morgan = require('morgan');
 
 const routeAdmin = require('./routes/admin');
+const routeEstados = require('./routes/estados');
+const routeCidades = require('./routes/cidades');
 
 app.use(morgan('dev'));
 
@@ -21,6 +23,10 @@ app.use((req, res, next) => {
 });
 
 app.use('/admin', routeAdmin);
+
+app.use('/estados', routeEstados);
+
+app.use('/cidades', routeCidades);
 
 app.use((req, res, next) => {
     const erro = new Error('Rota não encontrada');

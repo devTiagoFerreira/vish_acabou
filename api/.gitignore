@@ -4,8 +4,11 @@ node_modules/
 #Env
 .env
 
-#imagens
+#Images
 img/
+
+#Routes
+hash/
 
 
 

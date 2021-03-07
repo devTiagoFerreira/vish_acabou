@@ -15,6 +15,7 @@ exports.poolConnect = (query, params = []) => {
                 reject(error);
             } else {
                 conn.query(query, params, (error, results, fields) => {
+                    conn.release();
                     if (error) {
                         reject(error);
                     } else {

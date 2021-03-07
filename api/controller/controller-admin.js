@@ -3,8 +3,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 
-require('dotenv').config();
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './img/anuncios');
@@ -63,7 +61,7 @@ exports.login = (req, res, next) => {
                     email: results[0].email,
                     nome: results[0].nome,
                 };
-                jwt.sign(token, process.env.SECRET_KEY, { expiresIn: '30m' }, (error, token) => {
+                jwt.sign(token, process.env.VISH_SECRET_KEY, { expiresIn: '30m' }, (error, token) => {
                     if (error) {
                         return res.status(401).send({
                             erro: {
@@ -83,168 +81,5 @@ exports.login = (req, res, next) => {
         })
         .catch((error) => {
             return res.status(401).send({ erro: error });
-        });
-};
-
-//States POST
-exports.estadosPOST = (req, res, next) => {
-    const sigla = req.body.sigla || null;
-    const nome = req.body.nome || null;
-    if (!sigla || !nome) {
-        return res.status(400).send({
-            erro: {
-                mensagem: 'Campo não definido ou vazio',
-                estado: {
-                    sigla: sigla,
-                    nome: nome,
-                },
-            },
-        });
-    }
-    if (sigla.length > 2 || nome.length > 20) {
-        return res.status(400).send({
-            erro: {
-                mensagem: 'Quantidade de caracteres excedida',
-                estado: {
-                    sigla: sigla,
-                    nome: nome,
-                },
-                limite_caracteres: {
-                    sigla: 2,
-                    nome: 20,
-                },
-                quantidade_caracteres_informada: {
-                    sigla: sigla.length,
-                    nome: nome.length,
-                },
-            },
-        });
-    }
-    mysql
-        .poolConnect('select sigla, nome from tb_estados where sigla = ? or nome = ?', [sigla, nome])
-        .then((results) => {
-            if (results.length > 0) {
-                return res.status(422).send({
-                    erro: {
-                        mensagem: 'Estado já cadastrado',
-                        estado: results,
-                    },
-                });
-            }
-            mysql.poolConnect('insert into tb_estados values (0, ?, ?)', [sigla, nome]).then(() => {
-                return res
-                    .status(200)
-                    .send({
-                        resposta: {
-                            Mensagem: 'Cadastro efetuado com sucesso!',
-                            estado: { sigla: sigla, nome: nome },
-                        },
-                    })
-                    .catch((error) => {
-                        return res.status(500).send({
-                            erro: error,
-                        });
-                    });
-            });
-        })
-        .catch((error) => {
-            return res.status(500).send({
-                erro: error,
-            });
-        });
-};
-
-//States PATCH
-exports.estadosPATCH = (req, res, next) => {
-    const id_estado = req.params.id_estado;
-    const sigla = req.body.sigla || null;
-    const nome = req.body.nome || null;
-    if (!sigla || !nome) {
-        return res.status(400).send({
-            erro: {
-                mensagem: 'Campo não definido ou vazio',
-                estado: {
-                    id_estado: id_estado,
-                    sigla: sigla,
-                    nome: nome,
-                },
-            },
-        });
-    }
-    if (sigla.length > 2 || nome.length > 20) {
-        return res.status(400).send({
-            erro: {
-                mensagem: 'Quantidade de caracteres excedida',
-                estado: {
-                    id_estado: id_estado,
-                    sigla: sigla,
-                    nome: nome,
-                },
-                limite_caracteres: {
-                    sigla: 2,
-                    nome: 20,
-                },
-                quantidade_caracteres_informada: {
-                    sigla: sigla.length,
-                    nome: nome.length,
-                },
-            },
-        });
-    }
-    mysql
-        .poolConnect('select id from tb_estados where id = ?', [id_estado])
-        .then((results) => {
-            if (!results.length > 0) {
-                return res.status(422).send({
-                    erro: {
-                        mensagem: 'Id inválido',
-                    },
-                });
-            }
-            mysql
-                .poolConnect('select * from tb_estados where sigla = ? or nome = ?', [sigla, nome])
-                .then((results) => {
-                    if (results.length > 0) {
-                        let estado = [];
-                        results.forEach((row) => {
-                            if (row.id != id_estado) {
-                                estado.push(row);
-                            }
-                        });
-                        if (!estado.length == 0) {
-                            return res.status(422).send({
-                                erro: {
-                                    mensagem: 'Estado já cadastrado',
-                                    estado: estado,
-                                },
-                            });
-                        }
-                    }
-                    mysql.poolConnect('update tb_estados set sigla = ?, nome = ? where id = ?;', [sigla, nome, id_estado]).then(() => {
-                        return res
-                            .status(200)
-                            .send({
-                                resposta: {
-                                    Mensagem: 'Estado atualizado com sucesso!',
-                                    estado: { id: id_estado, sigla: sigla, nome: nome },
-                                },
-                            })
-                            .catch((error) => {
-                                return res.status(500).send({
-                                    erro: error,
-                                });
-                            });
-                    });
-                })
-                .catch((error) => {
-                    return res.status(500).send({
-                        erro: error,
-                    });
-                });
-        })
-        .catch((error) => {
-            return res.status(500).send({
-                erro: error,
-            });
         });
 };
