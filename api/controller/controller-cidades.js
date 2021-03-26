@@ -38,7 +38,7 @@ exports.cidadesGET = (req, res, next) => {
 //GET cities by uf
 exports.cidadesGETUF = (req, res, next) => {
     mysql
-        .poolConnect('select tb_cidades.id, tb_cidades.nome, tb_estados.uf from tb_cidades inner join tb_estados on (tb_cidades.id_estado = tb_estados.id) where tb_estados.id = ? order by tb_cidades.nome', [req.params.uf_id])
+        .poolConnect('select tb_cidades.id, tb_cidades.nome, tb_estados.uf from tb_cidades inner join tb_estados on (tb_cidades.id_estado = tb_estados.id) where tb_estados.id = ? order by tb_cidades.nome', [req.params.id_uf])
         .then((results) => {
             if (results.length < 1) {
                 return res.status(404).send({
@@ -73,7 +73,7 @@ exports.cidadesGETUF = (req, res, next) => {
 //GET cities by id
 exports.cidadesGETId = (req, res, next) => {
     mysql
-        .poolConnect('select tb_cidades.id, tb_cidades.nome, tb_estados.uf from tb_cidades inner join tb_estados on (tb_cidades.id_estado = tb_estados.id) where tb_cidades.id = ?', [req.params.cities_id])
+        .poolConnect('select tb_cidades.id, tb_cidades.nome, tb_estados.uf from tb_cidades inner join tb_estados on (tb_cidades.id_estado = tb_estados.id) where tb_cidades.id = ?', [req.params.id_cidade])
         .then((results) => {
             if (results.length < 1) {
                 return res.status(404).send({

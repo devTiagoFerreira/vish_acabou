@@ -38,7 +38,7 @@ exports.estadosGET = (req, res, next) => {
 //GET states by id
 exports.estadosGETId = (req, res, next) => {
     mysql
-        .poolConnect('select * from tb_estados where id = ?', [req.params.states_id])
+        .poolConnect('select * from tb_estados where id = ?', [req.params.id_estado])
         .then((results) => {
             if (results.length < 1) {
                 return res.status(404).send({

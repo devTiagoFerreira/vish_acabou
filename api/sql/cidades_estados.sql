@@ -1,11 +1,49 @@
-create table `tb_cidades` (
-  `id` int not null primary key,
-  `nome` varchar(120) default null,
-  `id_estado` int default null,
+create table tb_estados (
+  id int not null primary key,
+  nome varchar(30) default null,
+  uf char(2) default null
+);
+
+insert into tb_estados (id, nome, uf) values
+(1, 'Acre', 'AC'),
+(2, 'Alagoas', 'AL'),
+(3, 'Amazonas', 'AM'),
+(4, 'Amapá', 'AP'),
+(5, 'Bahia', 'BA'),
+(6, 'Ceará', 'CE'),
+(7, 'Distrito Federal', 'DF'),
+(8, 'Espírito Santo', 'ES'),
+(9, 'Goiás', 'GO'),
+(10, 'Maranhão', 'MA'),
+(11, 'Minas Gerais', 'MG'),
+(12, 'Mato Grosso do Sul', 'MS'),
+(13, 'Mato Grosso', 'MT'),
+(14, 'Pará', 'PA'),
+(15, 'Paraíba', 'PB'),
+(16, 'Pernambuco', 'PE'),
+(17, 'Piauí', 'PI'),
+(18, 'Paraná', 'PR'),
+(19, 'Rio de Janeiro', 'RJ'),
+(20, 'Rio Grande do Norte', 'RN'),
+(21, 'Rondônia', 'RO'),
+(22, 'Roraima', 'RR'),
+(23, 'Rio Grande do Sul', 'RS'),
+(24, 'Santa Catarina', 'SC'),
+(25, 'Sergipe', 'SE'),
+(26, 'São Paulo', 'SP'),
+(27, 'Tocantins', 'TO');
+
+alter table tb_estados
+  modify id int not null auto_increment, auto_increment=28;
+  
+create table tb_cidades (
+  id int not null primary key,
+  nome varchar(120) default null,
+  id_estado int default null,
   constraint fk_tb_estados foreign key (id_estado) references tb_estados (id)
 );
 
-insert into `tb_cidades` (`id`, `nome`, `id_estado`) values
+insert into tb_cidades (id, nome, id_estado) values
 (1, 'Afonso Cláudio', 8),
 (2, 'Água Doce do Norte', 8),
 (3, 'Águia Branca', 8),
@@ -2073,7 +2111,8 @@ insert into `tb_cidades` (`id`, `nome`, `id_estado`) values
 (2065, 'Montes Claros', 11),
 (2066, 'Montezuma', 11),
 (2067, 'Morada Nova de Minas', 11);
-INSERT INTO `cidades` (`id`, `nome`, `id_estado`) VALUES
+
+insert into tb_cidades (id, nome, id_estado) values
 (2068, 'Morro da Garça', 11),
 (2069, 'Morro do Pilar', 11),
 (2070, 'Munhoz', 11),
@@ -3983,7 +4022,8 @@ INSERT INTO `cidades` (`id`, `nome`, `id_estado`) VALUES
 (3974, 'Cruz Alta', 23),
 (3975, 'Cruzaltense', 23),
 (3976, 'Cruzeiro do Sul', 23);
-INSERT INTO `cidades` (`id`, `nome`, `id_estado`) VALUES
+
+insert into tb_cidades (id, nome, id_estado) values
 (3977, 'David Canabarro', 23),
 (3978, 'Derrubadas', 23),
 (3979, 'Dezesseis de Novembro', 23),
@@ -5573,43 +5613,5 @@ INSERT INTO `cidades` (`id`, `nome`, `id_estado`) VALUES
 (5563, 'Wanderlândia', 27),
 (5564, 'Xambioá', 27);
 
-create table `tb_estados` (
-  `id` int not null primary key,
-  `nome` varchar(30) default null,
-  `uf` char(2) default null
-);
-
-insert into `tb_estados` (`id`, `nome`, `uf`) values
-(1, 'Acre', 'AC'),
-(2, 'Alagoas', 'AL'),
-(3, 'Amazonas', 'AM'),
-(4, 'Amapá', 'AP'),
-(5, 'Bahia', 'BA'),
-(6, 'Ceará', 'CE'),
-(7, 'Distrito Federal', 'DF'),
-(8, 'Espírito Santo', 'ES'),
-(9, 'Goiás', 'GO'),
-(10, 'Maranhão', 'MA'),
-(11, 'Minas Gerais', 'MG'),
-(12, 'Mato Grosso do Sul', 'MS'),
-(13, 'Mato Grosso', 'MT'),
-(14, 'Pará', 'PA'),
-(15, 'Paraíba', 'PB'),
-(16, 'Pernambuco', 'PE'),
-(17, 'Piauí', 'PI'),
-(18, 'Paraná', 'PR'),
-(19, 'Rio de Janeiro', 'RJ'),
-(20, 'Rio Grande do Norte', 'RN'),
-(21, 'Rondônia', 'RO'),
-(22, 'Roraima', 'RR'),
-(23, 'Rio Grande do Sul', 'RS'),
-(24, 'Santa Catarina', 'SC'),
-(25, 'Sergipe', 'SE'),
-(26, 'São Paulo', 'SP'),
-(27, 'Tocantins', 'TO');
-
-alter table `tb_cidades`
-  modify `id` int not null auto_increment, auto_increment=5565;
-
-alter table `tb_estados`
-  modify `id` int not null auto_increment, auto_increment=28;
+alter table tb_cidades
+  modify id int not null auto_increment, auto_increment=5565;

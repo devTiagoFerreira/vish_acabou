@@ -65,18 +65,18 @@ create table tb_mensagens (
 
 create table tb_status_empresa (
 	id int auto_increment not null primary key,
-    status_empresa varchar(30) not null
+    status_empresa varchar(30) not null unique
 );
 
 create table tb_empresas (
 	id int auto_increment not null primary key,
-    email varchar(50) not null unique,
+    email varchar(100) not null unique,
     senha varchar(100) not null,
     logo varchar(100),
     razao_social varchar(100) not null,
     nome_fantasia varchar(100),
     ie varchar(15) not null,
-    cnpj varchar(18) not null,
+    cnpj varchar(18) not null unique,
     conta varchar(20) not null,
     agencia varchar(20) not null,
     site varchar(100),
@@ -85,11 +85,13 @@ create table tb_empresas (
 	numero varchar(10) not null,
 	bairro varchar(50) not null,
 	complemento varchar(50),
-	cidade varchar(50) not null,
-	estado varchar(20) not null,
+	cidade int not null,
+	estado int not null,
 	data_cadastro datetime default current_timestamp not null,
 	id_status_empresa int default 1 not null,
-    foreign key (id_status_empresa) references tb_status_empresa (id)
+    foreign key (id_status_empresa) references tb_status_empresa (id),
+    foreign key (cidade) references tb_cidades (id),
+    foreign key (estado) references tb_estados (id)
 );
 
 create table tb_status_seguidor (
@@ -232,7 +234,7 @@ create table tb_estados (
 create table tb_cidades_empresas (
 	id int auto_increment primary key,
     id_estado int not null,
-    nome varchar(100) not null unique,
+    nome varchar(100) not null,
     foreign key (id_estado) references tb_estados (id)
 );
 

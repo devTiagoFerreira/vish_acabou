@@ -5,13 +5,15 @@ const morgan = require('morgan');
 const routeAdmin = require('./routes/admin');
 const routeEstados = require('./routes/estados');
 const routeCidades = require('./routes/cidades');
+const routeValidador = require('./routes/validador');
+const routeEmpresas = require('./routes/empresas');
 
 app.use(morgan('dev'));
 
-app.use(express.urlencoded({ extended: false })); //Aceita apenas dados simples
-app.use(express.json()); //Aceita Apenas json
+app.use(express.urlencoded({ extended: false })); //Accepts only simple data
+app.use(express.json()); //Only accepts json
 
-//Configuração CORS
+//CORS Configuration
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Header', 'Origin , X-Requested-Width, Content-Type, Accept, Authorization');
@@ -23,10 +25,10 @@ app.use((req, res, next) => {
 });
 
 app.use('/admin', routeAdmin);
-
 app.use('/estados', routeEstados);
-
 app.use('/cidades', routeCidades);
+app.use('/validador', routeValidador);
+app.use('/empresas', routeEmpresas);
 
 app.use((req, res, next) => {
     const erro = new Error('Rota não encontrada');
