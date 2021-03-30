@@ -1,6 +1,6 @@
 const mysql = require('../mysql');
 
-//GET all states
+//Retorna todos os estados
 exports.estadosGET = (req, res, next) => {
     mysql
         .poolConnect('select * from tb_estados order by nome')
@@ -9,7 +9,7 @@ exports.estadosGET = (req, res, next) => {
                 return res.status(404).send({
                     erro: {
                         status: 404,
-                        mensagem: 'Nenhum registro encontrado',
+                        mensagem: 'Nenhum registro encontrado.',
                     },
                 });
             }
@@ -35,7 +35,7 @@ exports.estadosGET = (req, res, next) => {
         });
 };
 
-//GET states by id
+//Retorna o estado conforme o seu id
 exports.estadosGETId = (req, res, next) => {
     mysql
         .poolConnect('select * from tb_estados where id = ?', [req.params.id_estado])
@@ -44,7 +44,7 @@ exports.estadosGETId = (req, res, next) => {
                 return res.status(404).send({
                     erro: {
                         status: 404,
-                        mensagem: 'Nenhum registro encontrado',
+                        mensagem: 'Nenhum registro encontrado.',
                     },
                 });
             }

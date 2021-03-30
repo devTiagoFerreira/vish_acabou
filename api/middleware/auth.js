@@ -1,6 +1,6 @@
 const jtw = require('jsonwebtoken');
 
-exports.vishAuth = (req, res, next) => {
+exports.adminAuth = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
         var decode = jtw.verify(token, process.env.VISH_SECRET_KEY);
@@ -9,14 +9,14 @@ exports.vishAuth = (req, res, next) => {
     } catch {
         return res.status(401).send({
             erro: {
-                mensagem: 'Falha na autenticação',
-                motivo: 'Token não informado, não autorizado ou expirado',
+                mensagem: 'Falha na autenticação.',
+                motivo: 'Token não informado, não autorizado ou expirado.',
             },
         });
     }
 };
 
-exports.vishOptionalAuth = (req, res, next) => {
+exports.adminOptionalAuth = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
         var decode = jtw.verify(token, process.env.VISH_SECRET_KEY);
@@ -36,8 +36,8 @@ exports.empresaAuth = (req, res, next) => {
     } catch {
         return res.status(401).send({
             erro: {
-                mensagem: 'Falha na autenticação',
-                motivo: 'Token não informado, não autorizado ou expirado',
+                mensagem: 'Falha na autenticação.',
+                motivo: 'Token não informado, não autorizado ou expirado.',
             },
         });
     }

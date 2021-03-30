@@ -1,8 +1,4 @@
-create database bd_vish_acabou;
 
-use bd_vish_acabou;
-
-alter database bd_vish_acabou charset = utf8mb4 collate = utf8mb4_bin;
 
 create table tb_status_cliente (
 	id int auto_increment not null primary key,
@@ -61,37 +57,6 @@ create table tb_mensagens (
     foreign key (remetente) references tb_clientes (id),
     foreign key (destinatario) references tb_clientes (id),
     foreign key (id_status_msg) references tb_status_msg (id)
-);
-
-create table tb_status_empresa (
-	id int auto_increment not null primary key,
-    status_empresa varchar(30) not null unique
-);
-
-create table tb_empresas (
-	id int auto_increment not null primary key,
-    email varchar(100) not null unique,
-    senha varchar(100) not null,
-    logo varchar(100),
-    razao_social varchar(100) not null,
-    nome_fantasia varchar(100),
-    ie varchar(15) not null,
-    cnpj varchar(18) not null unique,
-    conta varchar(20) not null,
-    agencia varchar(20) not null,
-    site varchar(100),
-    cep varchar(9) not null,
-    logradouro varchar(100) not null,
-	numero varchar(10) not null,
-	bairro varchar(50) not null,
-	complemento varchar(50),
-	cidade int not null,
-	estado int not null,
-	data_cadastro datetime default current_timestamp not null,
-	id_status_empresa int default 1 not null,
-    foreign key (id_status_empresa) references tb_status_empresa (id),
-    foreign key (cidade) references tb_cidades (id),
-    foreign key (estado) references tb_estados (id)
 );
 
 create table tb_status_seguidor (
@@ -166,28 +131,21 @@ create table tb_anuncios (
     foreign key (id_status_anuncio) references tb_status_anuncio (id)
 );
 
-create table tb_atividades (
-	id int auto_increment not null primary key,
-    atividade varchar(30) not null,
-    desconto tinyint unsigned not null,
-    pontos smallint unsigned not null
-);
-
 create table tb_vendas (
 	id int auto_increment not null primary key,
     id_anuncio int not null,
     id_cliente int not null,
-    id_ativ_cliente int not null,
-    indicante int not null,
-    id_ativ_indicante int not null,
+    indicante int not null default 0,
     data_compra datetime default current_timestamp not null,
     quantidade tinyint unsigned not null,
     cod_ticket varchar(20),
-    foreign key (id_anuncio) references tb_anuncios (id),
-    foreign key (id_cliente) references tb_clientes (id),
-    foreign key (id_ativ_cliente) references tb_atividades (id),
-    foreign key (indicante) references tb_clientes (id),
-    foreign key (id_ativ_indicante) references tb_atividades (id)    
+    status_venda int not null default 1,
+    status_pagamento int null default 1,
+    constraint FK_anuncio foreign key (id_anuncio) references tb_anuncios (id),
+    constraint FK_cliente foreign key (id_cliente) references tb_clientes (id),
+    constraint FK_indicante foreign key (indicante) references tb_clientes (id),
+	constraint FK_status_venda foreign key (status_venda) references tb_status_venda (id),
+    constraint FK_status_pagamento foreign key (status_pagamento) references tb_status_pagamento (id)
 );
 
 create table tb_redes_sociais (

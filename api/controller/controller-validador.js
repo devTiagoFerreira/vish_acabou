@@ -1,6 +1,6 @@
 const func = require('../functions/functions');
 
-//CNPJ validator
+//Validador de CNPJ
 exports.cnpjValidator = (req, res, next) => {
     const cnpj = req.params.cnpj.replace(/([^\d])+/gim, '');
     const cnpj_valido = func.cnpjValidator(cnpj);
@@ -20,7 +20,7 @@ exports.cnpjValidator = (req, res, next) => {
     });
 };
 
-//IE validator
+//Validador de IE
 exports.ieValidator = (req, res, next) => {
     const ie = req.params.ie.replace(/([^\d])+/gim, '');
     const ie_valido = func.ieValidator(ie);

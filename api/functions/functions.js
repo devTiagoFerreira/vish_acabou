@@ -11,7 +11,7 @@ exports.firstLetterToUpperCase = (letter) => {
     return word;
 };
 
-//CNJP Validator
+//Validador de CNJP
 exports.cnpjValidator = (cnpj) => {
     const keys_one = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
     if (cnpj.length != 14) {
@@ -52,7 +52,7 @@ exports.cnpjValidator = (cnpj) => {
     }
 };
 
-//IE Validator
+//Validador de IE
 
 exports.ieValidator = (ie) => {
     if (ie.length != 12) {
@@ -85,4 +85,11 @@ exports.ieValidator = (ie) => {
             }
         }
     }
+};
+
+//Validador de  e-mail
+
+exports.emailValidator = (email) => {
+    const emailValido = email.indexOf('@') > -1;
+    return emailValido;
 };

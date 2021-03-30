@@ -3,10 +3,10 @@ const router = express.Router();
 const empresas = require('../controller/controller-empresas');
 const auth = require('../middleware/auth');
 
-//Admin Login
+//Login
 router.post('/login', empresas.login);
 
-//Company Activation
+//Ativação de cadastro
 router.get('/ativar', auth.empresaAuth, empresas.activation);
 
 module.exports = router;

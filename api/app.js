@@ -2,18 +2,20 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 
-const routeAdmin = require('./routes/admin');
+//Importaçao de rotas
+const routeAdmin = require('./admin');
 const routeEstados = require('./routes/estados');
 const routeCidades = require('./routes/cidades');
 const routeValidador = require('./routes/validador');
 const routeEmpresas = require('./routes/empresas');
+const routeImagens = require('./routes/imagens');
 
 app.use(morgan('dev'));
 
-app.use(express.urlencoded({ extended: false })); //Accepts only simple data
-app.use(express.json()); //Only accepts json
+app.use(express.urlencoded({ extended: false })); //Aceita apenas dados simples
+app.use(express.json()); //Aceita apensa json
 
-//CORS Configuration
+//Configuração de CORS
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Header', 'Origin , X-Requested-Width, Content-Type, Accept, Authorization');
@@ -24,14 +26,16 @@ app.use((req, res, next) => {
     next();
 });
 
+//Rotas
 app.use('/admin', routeAdmin);
 app.use('/estados', routeEstados);
 app.use('/cidades', routeCidades);
 app.use('/validador', routeValidador);
 app.use('/empresas', routeEmpresas);
+app.use('/imagens', routeImagens);
 
 app.use((req, res, next) => {
-    const erro = new Error('Rota não encontrada');
+    const erro = new Error('Rota não encontrada.');
     erro.status = 404;
     next(erro);
 });

@@ -8,6 +8,7 @@ var pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
 });
 
+//Conexão com busca direta
 exports.poolConnect = (query, params = []) => {
     return new Promise((resolve, reject) => {
         pool.getConnection((error, conn) => {
@@ -27,6 +28,7 @@ exports.poolConnect = (query, params = []) => {
     });
 };
 
+//Conexão com busca linha a linha
 exports.poolLineToLine = (query, params = []) => {
     return new Promise((resolve, reject) => {
         pool.getConnection((error, conn) => {
@@ -34,9 +36,9 @@ exports.poolLineToLine = (query, params = []) => {
                 reject(error);
             } else {
                 const qry = conn.query(query, params);
-                let results = {};
-                let err;
-                let count;
+                let results = [];
+                let err = false;
+                let count = 0;
                 qry.on('error', (error) => {
                     err = error;
                 });
