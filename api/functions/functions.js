@@ -1,16 +1,3 @@
-exports.firstLetterToUpperCase = (letter) => {
-    letter = letter.toLowerCase().split(' ');
-    let word = '';
-    for (var i = 0; i < letter.length; i++) {
-        if (i < letter.length - 1) {
-            word += letter[i].charAt(0).toUpperCase() + letter[i].substr(1) + ' ';
-        } else {
-            word += letter[i].charAt(0).toUpperCase() + letter[i].substr(1);
-        }
-    }
-    return word;
-};
-
 //Validador de CNJP
 exports.cnpjValidator = (cnpj) => {
     const keys_one = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
@@ -53,7 +40,6 @@ exports.cnpjValidator = (cnpj) => {
 };
 
 //Validador de IE
-
 exports.ieValidator = (ie) => {
     if (ie.length != 12) {
         return false;
@@ -88,8 +74,19 @@ exports.ieValidator = (ie) => {
 };
 
 //Validador de  e-mail
-
 exports.emailValidator = (email) => {
     const emailValido = email.indexOf('@') > -1;
     return emailValido;
+};
+
+//Verificador de contatos
+exports.verificaSeContatoExiste = (contatos = {}) => {
+    let contato = {};
+    for (let i = 0; i < Object.keys(contatos).length; i++) {
+        let whatsapp = contatos[Object.keys(contatos)[i]].whatsapp || false
+        if (contatos[Object.keys(contatos)[i]].numero) {
+            contato[Object.keys(contatos)[i]] = {numero: contatos[Object.keys(contatos)[i]].numero, whatsapp: whatsapp};
+        }
+    }
+    return contato;
 };

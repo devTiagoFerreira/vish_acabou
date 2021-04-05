@@ -31,8 +31,7 @@ exports.empresaLogo = (req, res, next) => {
                 });
             }
             const nomeLogo = path.basename(logoPath);
-            const mimetype = mime.getType('./img/empresa/logo/logo.webp');
-            console.log(mimetype);
+            const mimetype = mime.getType(logoPath);
 
             res.setHeader('Content-disposition', 'attachment; filename=' + nomeLogo);
 

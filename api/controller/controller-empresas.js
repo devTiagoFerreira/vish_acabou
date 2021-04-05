@@ -41,7 +41,7 @@ exports.login = (req, res, next) => {
                     email: results[0].email,
                     razao_social: results[0].razao_social,
                 };
-                jwt.sign(token, process.env.COMPANY_SECRET_KEY, { expiresIn: '30m' }, (error, token) => {
+                jwt.sign(token, process.env.COMPANY_SECRET_KEY, { expiresIn: '1h' }, (error, token) => {
                     if (error) {
                         return res.status(500).send({
                             erro: {
@@ -67,7 +67,7 @@ exports.login = (req, res, next) => {
 };
 
 //Ativação de cadastro
-exports.activation = (req, res, next) => {
+exports.validarEmail = (req, res, next) => {
     const token = req.body.token_ativacao || null;
     if (!token) {
         return res.status(400).send({

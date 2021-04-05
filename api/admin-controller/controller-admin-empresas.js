@@ -10,27 +10,42 @@ const fs = require('fs');
 const multer = require('multer');
 
 //Cadasto de empresas
-exports.cadastroEmpresas = (req, res, next) => {
+exports.cadastraEmpresa = (req, res, next) => {
     const empresa_geral = {
-        nome_fantasia: req.body.nome_fantasia,
-        site: req.body.site,
-        complemento: req.body.complemento,
+        nome_fantasia: req.body.nome_fantasia || null,
+        site: req.body.site || null,
+        complemento: req.body.complemento || null,
     };
 
-    const empresa_contato = {
-        telefone: req.body.telefone.replace(/([^\d])+/gim, '') || null,
-        whatsapp: req.body.whatsapp.replace(/([^\d])+/gim, '') || null,
-    };
+    let ie = req.body.ie || null;
+
+    let cnpj = req.body.cnpj || null;
+    if (cnpj != null) {
+        cnpj = cnpj.replace(/([^\d])+/gim, '');
+    }
+
+    let cep = req.body.cep || null;
+    if (cep != null) {
+        cep = cep.replace(/([^\d])+/gim, '');
+    }
+
+    if (ie != null) {
+        ie = ie.toUpperCase();
+        if (ie != 'ISENTO') {
+            ie = ie.replace(/([^\d])+/gim, '');
+            ie = ie || null;
+        }
+    }
 
     const empresa_obg = [
         (email = req.body.email || null),
         (senha = req.body.senha || null),
         (razao_social = req.body.razao_social || null),
-        (ie = req.body.ie.replace(/([^\d])+/gim, '') || null),
-        (cnpj = req.body.cnpj.replace(/([^\d])+/gim, '') || null),
+        (ie = ie),
+        (cnpj = cnpj),
         (conta = req.body.conta || null),
         (agencia = req.body.agencia || null),
-        (cep = req.body.cep || null),
+        (cep = cep),
         (logradouro = req.body.logradouro || null),
         (numero = req.body.numero || null),
         (bairro = req.body.bairro || null),
@@ -41,8 +56,7 @@ exports.cadastroEmpresas = (req, res, next) => {
     if (!func.emailValidator(empresa_obg[0])) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'O email informado é inválido.',
+                mensagem: 'O email informado é inválido',
                 email: empresa_obg[0],
             },
         });
@@ -52,8 +66,7 @@ exports.cadastroEmpresas = (req, res, next) => {
         if (!empresa_obg[i]) {
             return res.status(400).send({
                 erro: {
-                    status: 400,
-                    mensagem: 'Campos obrigatórios incompletos.',
+                    mensagem: 'Campos obrigatórios incompletos',
                     campos_obrigatorios: {
                         email: empresa_obg[0],
                         senha: empresa_obg[1],
@@ -74,41 +87,50 @@ exports.cadastroEmpresas = (req, res, next) => {
         }
     }
 
-    if (!empresa_contato.telefone && !empresa_contato.whatsapp) {
-        return res.status(400).send({
-            erro: {
-                status: 400,
-                mensagem: 'É necessário informar pelo menos um número para contato.',
-                contato: {
-                    telefone: empresa_contato.telefone,
-                    whatsapp: empresa_contato.whatsapp,
-                },
-            },
-        });
-    }
-
     //Validador de CNPJ
     const cnpj_valido = func.cnpjValidator(empresa_obg[4]);
 
     if (!cnpj_valido) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'O CNPJ informado é inválido.',
-                contato: empresa_obg[4],
+                mensagem: 'O CNPJ informado é inválido',
+                cnpj: empresa_obg[4],
             },
         });
     }
 
     //Validador de IE
-    const ei_valido = func.ieValidator(empresa_obg[3]);
+    if (empresa_obg[3] != 'ISENTO') {
+        const ie_valido = func.ieValidator(empresa_obg[3]);
 
-    if (!ei_valido) {
+        if (!ie_valido) {
+            return res.status(400).send({
+                erro: {
+                    mensagem: 'A Inscrição Estadual informada é inválida',
+                    ie: empresa_obg[3],
+                },
+            });
+        }
+    }
+
+    let contatos = req.body.contatos || null;
+
+    if (!contatos || Object.keys(contatos).length == 0) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'A Inscrição Estadual informada é inválida.',
-                contato: empresa_obg[3],
+                mensagem: 'Informe um número de telefone para contato',
+                contatos: contatos,
+            },
+        });
+    }
+
+    contatos = func.verificaSeContatoExiste(contatos);
+
+    if (Object.keys(contatos).length == 0) {
+        return res.status(400).send({
+            erro: {
+                mensagem: 'Informe um número de telefone para contato',
+                contatos: contatos,
             },
         });
     }
@@ -117,33 +139,29 @@ exports.cadastroEmpresas = (req, res, next) => {
         .poolConnect('select email, cnpj from tb_empresas where email = ? or cnpj = ?', [empresa_obg[0], empresa_obg[4]])
         .then((results) => {
             if (results.length == 1) {
-                if (results[0].email == email && results[0].cnpj == cnpj) {
+                if (results[0].email == empresa_obg[0] && results[0].cnpj == empresa_obg[4]) {
                     return res.status(422).send({
                         erro: {
-                            status: 422,
-                            mensagem: 'Email e CNPJ já cadastrados.',
+                            mensagem: 'Email e CNPJ já cadastrados',
                         },
                     });
-                } else if (results[0].email == email) {
+                } else if (results[0].email == empresa_obg[0]) {
                     return res.status(422).send({
                         erro: {
-                            status: 422,
-                            mensagem: 'Email já cadastrado.',
+                            mensagem: 'Email já cadastrado',
                         },
                     });
                 } else {
                     return res.status(422).send({
                         erro: {
-                            status: 422,
-                            mensagem: 'CNPJ já cadastrado.',
+                            mensagem: 'CNPJ já cadastrado',
                         },
                     });
                 }
             } else if (results.length > 1) {
                 return res.status(422).send({
                     erro: {
-                        status: 422,
-                        mensagem: 'Email e CNPJ já cadastrados.',
+                        mensagem: 'Email e CNPJ já cadastrados',
                     },
                 });
             }
@@ -152,11 +170,11 @@ exports.cadastroEmpresas = (req, res, next) => {
                 if (error) {
                     return res.status(500).send({
                         erro: {
-                            status: 500,
-                            mensagem: 'Erro interno no servidor.',
+                            mensagem: 'Erro interno no servidor',
                         },
                     });
                 }
+
                 mysql
                     .poolConnect('insert into tb_empresas values (0, ?, ?, null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default, default)', [
                         empresa_obg[0], //email
@@ -177,26 +195,21 @@ exports.cadastroEmpresas = (req, res, next) => {
                         empresa_obg[12], //estado
                     ])
                     .then((results) => {
-                        mysql
-                            .poolConnect('insert into tb_contato_empresa values (0, ?, ?, ?)', [results.insertId, empresa_contato.telefone, empresa_contato.whatsapp])
-                            .then((results) => {
-                                console.log(results);
-                            })
-                            .catch((error) => {
+                        for (let i = 0; i < Object.keys(contatos).length; i++) {
+                            mysql.poolConnect('insert into tb_contato_empresa values (0, ?, ?, ?)', [results.insertId, contatos[Object.keys(contatos)[i]].numero, contatos[Object.keys(contatos)[i]].whatsapp]).catch((error) => {
                                 return res.status(500).send({
                                     erro: {
-                                        status: 500,
                                         mensagem: error,
                                     },
                                 });
                             });
+                        }
                         jwt.sign({ id: results.insertId, email: empresa_obg[0] }, process.env.EMAIL_SECRET_KEY, { expiresIn: '7d' }, (error, token) => {
                             if (error) {
                                 return res.status(500).send({
                                     erro: {
-                                        status: 500,
-                                        mensagem: 'Casdasto efetuado com sucesso, porém houve uma falha no envio do e-mail de confirmação.',
-                                        motivo: 'Erro na geração do token de confirmação.',
+                                        mensagem: 'Casdasto efetuado com sucesso, porém houve uma falha no envio do e-mail de confirmação',
+                                        motivo: 'Erro na geração do token de confirmação',
                                     },
                                 });
                             }
@@ -220,17 +233,13 @@ exports.cadastroEmpresas = (req, res, next) => {
                                 if (error) {
                                     return res.status(500).send({
                                         erro: {
-                                            status: 500,
-                                            mensagem: 'Cadastro efetuado com sucesso, porém não foi possível enviar o e-mail de confirmação.',
-                                            motivo: 'Erro no envio do e-mail de confirmação.',
+                                            mensagem: 'Cadastro efetuado com sucesso, porém não foi possível enviar o e-mail de confirmação',
+                                            motivo: 'Erro no envio do e-mail de confirmação',
                                         },
                                     });
                                 } else {
                                     return res.status(201).send({
-                                        resposta: {
-                                            status: 201,
-                                            mensagem: 'Cadastro efetuado com sucesso!',
-                                        },
+                                        mensagem: 'Cadastro efetuado com sucesso',
                                     });
                                 }
                             });
@@ -239,12 +248,89 @@ exports.cadastroEmpresas = (req, res, next) => {
                     .catch((error) => {
                         return res.status(500).send({
                             erro: {
-                                status: 500,
                                 mensagem: error,
                             },
                         });
                     });
             });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    mensagem: error,
+                },
+            });
+        });
+};
+
+//Adiciona novos contatos
+exports.addContatos = (req, res, next) => {
+    const id_empresa = req.params.id_empresa;
+    let contatos = req.body.contatos || null;
+
+    if (!contatos || Object.keys(contatos).length == 0) {
+        return res.status(400).send({
+            erro: {
+                status: 400,
+                mensagem: 'Informe um número de telefone para contato.',
+                contatos: contatos,
+            },
+        });
+    }
+
+    contatos = func.verificaSeContatoExiste(contatos);
+
+    if (Object.keys(contatos).length == 0) {
+        return res.status(400).send({
+            erro: {
+                status: 400,
+                mensagem: 'Informe um número de telefone para contato.',
+                contatos: contatos,
+            },
+        });
+    }
+
+    mysql
+        .poolConnect('select id, razao_social from tb_empresas where id = ?', [id_empresa])
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    erro: {
+                        status: 404,
+                        mensagem: 'Nenhum cadastro com o id fornecido foi encontrado.',
+                    },
+                });
+            }
+
+            (async function () {
+                for (let i = 0; i < Object.keys(contatos).length; i++) {
+                    try {
+                        const verificaSeContatoExiste = await mysql.poolConnect('select id from tb_contato_empresa where id_empresa = ? and numero = ?', [id_empresa, contatos[Object.keys(contatos)[i]].numero]);
+
+                        if (verificaSeContatoExiste.length == 0) {
+                            const add = await mysql.poolConnect('insert into tb_contato_empresa values (0, ?, ?, ?)', [id_empresa, contatos[Object.keys(contatos)[i]].numero, contatos[Object.keys(contatos)[i]].whatsapp]);
+                        }
+                    } catch {
+                        return res.status(500).send({
+                            erro: {
+                                status: 500,
+                                mensagem: 'Não foi possível adicionar os dados.',
+                            },
+                        });
+                    }
+                }
+                return res.status(201).send({
+                    resposta: {
+                        status: 201,
+                        mensagem: 'Dados adicionados com sucesso.',
+                        empresa: {
+                            id: results[0].id,
+                            razao_social: results[0].razao_social,
+                            contatos: contatos,
+                        },
+                    },
+                });
+            })();
         })
         .catch((error) => {
             return res.status(500).send({
@@ -256,7 +342,7 @@ exports.cadastroEmpresas = (req, res, next) => {
         });
 };
 
-//Reenviar e-mail de ativação de cadastro
+//Reenvia e-mail de ativação de cadastro
 exports.reenviarEmail = (req, res, next) => {
     const email = req.body.email || null;
 
@@ -349,7 +435,7 @@ exports.reenviarEmail = (req, res, next) => {
         });
 };
 
-//Alterar e-mail
+//Altera e-mail
 exports.alterarEmail = (req, res, next) => {
     const emailAtual = req.body.email_atual || null;
     const novoEmail = req.body.novo_email || null;
@@ -495,12 +581,92 @@ exports.alterarEmail = (req, res, next) => {
         });
 };
 
-//Retorna todas as empresas cadastradas - Dados parciais
-exports.empresas = (req, res, next) => {
+//Atualiza os dados cadastrais da empresa conforme id
+exports.alterarDadosCadastrais = (req, res, next) => {
+    const id_empresa = req.params.id_empresa;
+
+    const empresa_geral = {
+        nome_fantasia: req.body.nome_fantasia || null,
+        site: req.body.site || null,
+        complemento: req.body.complemento || null,
+    };
+
+    let ie = req.body.ie || null;
+
+    let cnpj = req.body.cnpj || null;
+    if (cnpj != null) {
+        cnpj = cnpj.replace(/([^\d])+/gim, '');
+    }
+
+    let cep = req.body.cep || null;
+    if (cep != null) {
+        cep = cep.replace(/([^\d])+/gim, '');
+    }
+
+    if (ie != null) {
+        ie = ie.toUpperCase();
+        if (ie != 'ISENTO') {
+            ie = ie.replace(/([^\d])+/gim, '');
+            ie = ie || null;
+        }
+    }
+
+    const empresa_obg = [(razao_social = req.body.razao_social || null), (ie = ie), (cnpj = cnpj), (conta = req.body.conta || null), (agencia = req.body.agencia || null), (cep = cep), (logradouro = req.body.logradouro || null), (numero = req.body.numero || null), (bairro = req.body.bairro || null), (cidade = req.body.cidade || null), (estado = req.body.estado || null)];
+
+    for (let i = 0; i < empresa_obg.length; ++i) {
+        if (!empresa_obg[i]) {
+            return res.status(400).send({
+                erro: {
+                    status: 400,
+                    mensagem: 'Campos obrigatórios incompletos.',
+                    campos_obrigatorios: {
+                        razao_social: empresa_obg[0],
+                        ie: empresa_obg[1],
+                        cnpj: empresa_obg[2],
+                        conta: empresa_obg[3],
+                        agencia: empresa_obg[4],
+                        cep: empresa_obg[5],
+                        logradouro: empresa_obg[6],
+                        numero: empresa_obg[7],
+                        bairro: empresa_obg[8],
+                        cidade: empresa_obg[9],
+                        estado: empresa_obg[10],
+                    },
+                },
+            });
+        }
+    }
+
+    //Validador de CNPJ
+    const cnpj_valido = func.cnpjValidator(empresa_obg[2]);
+
+    if (!cnpj_valido) {
+        return res.status(400).send({
+            erro: {
+                status: 400,
+                mensagem: 'O CNPJ informado é inválido.',
+                cnpj: empresa_obg[2],
+            },
+        });
+    }
+
+    //Validador de IE
+    if (empresa_obg[3] != 'ISENTO') {
+        const ie_valido = func.ieValidator(empresa_obg[1]);
+
+        if (!ie_valido) {
+            return res.status(400).send({
+                erro: {
+                    status: 400,
+                    mensagem: 'A Inscrição Estadual informada é inválida.',
+                    ie: empresa_obg[1],
+                },
+            });
+        }
+    }
+
     mysql
-        .poolLineToLine(
-            'select tb_empresas.logo, tb_empresas.id, tb_empresas.razao_social, tb_empresas.nome_fantasia, tb_cidades.nome as cidade, tb_estados.uf as estado, tb_status_empresa.status_empresa as "status" from tb_empresas inner join tb_cidades inner join tb_estados inner join tb_status_empresa on (tb_empresas.cidade = tb_cidades.id) and (tb_empresas.estado = tb_estados.id) and (tb_empresas.id_status_empresa = tb_status_empresa.id) order by tb_empresas.razao_social'
-        )
+        .poolConnect('select id from tb_empresas where id = ?', [id_empresa])
         .then((results) => {
             if (results.length == 0) {
                 return res.status(404).send({
@@ -510,24 +676,93 @@ exports.empresas = (req, res, next) => {
                     },
                 });
             }
-            return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    registros: results.length,
-                    empresas: results.map((row) => {
-                        return {
-                            id: row.id,
-                            logo: row.logo,
-                            razao_social: row.razao_social,
-                            nome_fantasia: row.nome_fantasia,
-                            cidade: row.cidade,
-                            estado: row.estado,
-                            status: row.status,
-                            url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id,
-                        };
-                    }),
-                },
-            });
+            mysql
+                .poolConnect('select ie, cnpj from tb_empresas where (ie= ? or cnpj = ?) and id != ? ', [empresa_obg[1], empresa_obg[2], id_empresa])
+                .then((results) => {
+                    if (results.length == 1) {
+                        if (results[0].ie == empresa_obg[1] && results[0].cnpj == empresa_obg[2]) {
+                            return res.status(422).send({
+                                erro: {
+                                    status: 422,
+                                    mensagem: 'Inscrição Estadual e CNPJ já cadastrados.',
+                                },
+                            });
+                        } else if (results[0].ie == empresa_obg[1]) {
+                            return res.status(422).send({
+                                erro: {
+                                    status: 422,
+                                    mensagem: 'Inscrição Estadual já cadastrada.',
+                                },
+                            });
+                        } else {
+                            return res.status(422).send({
+                                erro: {
+                                    status: 422,
+                                    mensagem: 'CNPJ já cadastrado.',
+                                },
+                            });
+                        }
+                    } else if (results.length > 1) {
+                        return res.status(422).send({
+                            erro: {
+                                status: 422,
+                                mensagem: 'Inscrição Estadual e CNPJ já cadastrados.',
+                            },
+                        });
+                    }
+
+                    mysql
+                        .poolConnect('update tb_empresas set razao_social = ?, nome_fantasia = ?, ie = ?, cnpj = ?, conta = ?, agencia = ?, site = ?, cep = ?, logradouro = ?, numero = ?, bairro = ?, complemento = ?, cidade = ?, estado = ? where id = ?', [
+                            empresa_obg[0], //razao_social
+                            empresa_geral.nome_fantasia,
+                            empresa_obg[1], //ie
+                            empresa_obg[2], //cnpj
+                            empresa_obg[3], //conta
+                            empresa_obg[4], //agencia
+                            empresa_geral.site,
+                            empresa_obg[5], //cep
+                            empresa_obg[6], //logradouro
+                            empresa_obg[7], //numero
+                            empresa_obg[8], //bairro
+                            empresa_geral.complemento,
+                            empresa_obg[9], //cidade
+                            empresa_obg[10], //estado
+                            id_empresa,
+                        ])
+                        .then((results) => {
+                            if (results.affectedRows == 0) {
+                                return res.status(500).send({
+                                    erro: {
+                                        status: 500,
+                                        mensagem: 'Alterações não efetuadas.',
+                                        motivo: 'Erro interno no servidor, erro na sintaxe de update SQL.',
+                                    },
+                                });
+                            }
+                            return res.status(200).send({
+                                resposta: {
+                                    status: 200,
+                                    mensagem: 'Dados atualizados com sucesso.',
+                                },
+                            });
+                        })
+                        .catch((error) => {
+                            return res.status(500).send({
+                                erro: {
+                                    status: 500,
+                                    mensagem: error,
+                                },
+                            });
+                        });
+                })
+                .catch((error) => {
+                    return res.status(500).send({
+                        erro: {
+                            status: 500,
+                            mensagem: error,
+                        },
+                    });
+                });
         })
         .catch((error) => {
             return res.status(500).send({
@@ -539,74 +774,44 @@ exports.empresas = (req, res, next) => {
         });
 };
 
-//Retorna todas as empresas cadastradas de acordo com os filtros - Dados parciais
-exports.filtroEmpresas = (req, res, next) => {
-    const chave = req.body.palavra_chave || '%';
-    const estado = req.body.id_estado || '%';
-    const cidade = req.body.id_cidade || '%';
-    const status = req.body.id_status || '%';
-    mysql
-        .poolLineToLine(
-            'select tb_empresas.logo, tb_empresas.id, tb_empresas.razao_social, tb_empresas.nome_fantasia, tb_cidades.nome as cidade, tb_estados.uf as estado, tb_status_empresa.status_empresa as "status" from tb_empresas inner join tb_cidades inner join tb_estados inner join tb_status_empresa on (tb_empresas.cidade = tb_cidades.id) and (tb_empresas.estado = tb_estados.id) and (tb_empresas.id_status_empresa = tb_status_empresa.id) where (tb_empresas.razao_social like "%"?"%" or tb_empresas.nome_fantasia like "%"?"%") and tb_estados.id like ? and tb_cidades.id like ? and tb_status_empresa.id like ? order by tb_empresas.razao_social',
-            [chave, chave, estado, cidade, status]
-        )
-        .then((results) => {
-            if (results.length == 0) {
-                return res.status(404).send({
-                    erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro encontado.',
-                    },
-                });
-            }
-            return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    registros: results.length,
-                    empresas: results.map((row) => {
-                        let url = { url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id };
-                        Object.assign(row, url);
-                        return row;
-                    }),
-                },
-            });
-        })
-        .catch((error) => {
-            return res.status(500).send({
-                erro: {
-                    status: 500,
-                    mensagem: error,
-                },
-            });
-        });
-};
+//Atualiza contato conforme id fornecido
+exports.atualizaContato = (req, res, next) => {
+    const id_contato = req.params.id_contato;
+    const numero = req.body.numero || null;
+    const whatsapp = req.body.whatsapp || false;
 
-//Retorna a empresa cadastrada de acordo com o id - Quase todos os dados
-exports.idEmpresas = (req, res, next) => {
-    const id = req.params.id;
+    if (!numero) {
+        return res.status(400).send({
+            erro: {
+                status: 400,
+                mensagem: 'Nenhum numero para contato fornecido.',
+                contato: {
+                    numero: numero,
+                    whatsapp: whatsapp,
+                },
+            },
+        });
+    }
+
     mysql
-        .poolLineToLine(
-            'select tb_empresas.id, tb_empresas.email, tb_empresas.logo, tb_empresas.razao_social, tb_empresas.nome_fantasia, tb_empresas.ie, tb_empresas.cnpj, tb_empresas.conta, tb_empresas.agencia, tb_empresas.site, tb_empresas.cep, tb_empresas.logradouro, tb_empresas.numero, tb_empresas.bairro, tb_empresas.complemento, tb_cidades.nome as cidade, tb_estados.uf as estado, date_format(tb_empresas.data_cadastro, "%d/%m/%Y às %H:%ih") as data_cadastro, tb_status_empresa.status_empresa as "status" from tb_empresas inner join tb_cidades inner join tb_estados inner join tb_status_empresa on (tb_empresas.cidade = tb_cidades.id) and (tb_empresas.estado = tb_estados.id) and (tb_empresas.id_status_empresa = tb_status_empresa.id) where tb_empresas.id = ? order by tb_empresas.razao_social',
-            [id]
-        )
+        .poolConnect('update tb_contato_empresa set numero = ?, whatsapp = ? where id = ?', [numero, whatsapp, id_contato])
         .then((results) => {
-            if (results.length == 0) {
+            if (results.affectedRows == 0) {
                 return res.status(404).send({
                     erro: {
                         status: 404,
-                        mensagem: 'Nenhum cadastro encontado.',
+                        mensagem: 'Nenhum contato com o id fornecido foi encontrado para atualização.',
                     },
                 });
             }
             return res.status(200).send({
                 resposta: {
                     status: 200,
-                    registros: results.length,
-                    empresas: results.map((row) => {
-                        let url = { url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id };
-                        Object.assign(row, url);
-                        return row;
-                    }),
+                    mensagem: 'Contato atualizado com sucesso.',
+                    contato: {
+                        numero: numero,
+                        whatsapp: whatsapp,
+                    },
                 },
             });
         })
@@ -741,6 +946,226 @@ exports.atualizarLogo = (req, res, next) => {
                             },
                         });
                     });
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    status: 500,
+                    mensagem: error,
+                },
+            });
+        });
+};
+
+//Retorna todas as empresas cadastradas - Dados parciais
+exports.empresas = (req, res, next) => {
+    mysql
+        .poolLineToLine(
+            'select tb_empresas.logo, tb_empresas.id, tb_empresas.razao_social, tb_empresas.nome_fantasia, tb_cidades.nome as cidade, tb_estados.uf as estado, tb_status_empresa.status_empresa as "status" from tb_empresas inner join tb_cidades inner join tb_estados inner join tb_status_empresa on (tb_empresas.cidade = tb_cidades.id) and (tb_empresas.estado = tb_estados.id) and (tb_empresas.id_status_empresa = tb_status_empresa.id) order by tb_empresas.razao_social'
+        )
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    erro: {
+                        status: 404,
+                        mensagem: 'Nenhum cadastro encontado.',
+                    },
+                });
+            }
+            return res.status(200).send({
+                resposta: {
+                    status: 200,
+                    registros: results.length,
+                    empresas: results.map((row) => {
+                        return {
+                            id: row.id,
+                            logo: row.logo,
+                            razao_social: row.razao_social,
+                            nome_fantasia: row.nome_fantasia,
+                            cidade: row.cidade,
+                            estado: row.estado,
+                            status: row.status,
+                            url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id,
+                        };
+                    }),
+                },
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    status: 500,
+                    mensagem: error,
+                },
+            });
+        });
+};
+
+//Retorna todas as empresas cadastradas de acordo com os filtros - Dados parciais
+exports.filtroEmpresas = (req, res, next) => {
+    const chave = req.body.palavra_chave || '%';
+    const estado = req.body.id_estado || '%';
+    const cidade = req.body.id_cidade || '%';
+    const status = req.body.id_status || '%';
+    mysql
+        .poolLineToLine(
+            'select tb_empresas.logo, tb_empresas.id, tb_empresas.razao_social, tb_empresas.nome_fantasia, tb_cidades.nome as cidade, tb_estados.uf as estado, tb_status_empresa.status_empresa as "status" from tb_empresas inner join tb_cidades inner join tb_estados inner join tb_status_empresa on (tb_empresas.cidade = tb_cidades.id) and (tb_empresas.estado = tb_estados.id) and (tb_empresas.id_status_empresa = tb_status_empresa.id) where (tb_empresas.razao_social like "%"?"%" or tb_empresas.nome_fantasia like "%"?"%") and tb_estados.id like ? and tb_cidades.id like ? and tb_status_empresa.id like ? order by tb_empresas.razao_social',
+            [chave, chave, estado, cidade, status]
+        )
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    erro: {
+                        status: 404,
+                        mensagem: 'Nenhum cadastro encontado.',
+                    },
+                });
+            }
+            return res.status(200).send({
+                resposta: {
+                    status: 200,
+                    registros: results.length,
+                    empresas: results.map((row) => {
+                        let url = { url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id };
+                        Object.assign(row, url);
+                        return row;
+                    }),
+                },
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    status: 500,
+                    mensagem: error,
+                },
+            });
+        });
+};
+
+//Retorna a empresa cadastrada de acordo com o id - Quase todos os dados
+exports.idEmpresas = (req, res, next) => {
+    const id = req.params.id;
+    mysql
+        .poolLineToLine(
+            'select tb_empresas.id, tb_empresas.email, tb_empresas.logo, tb_empresas.razao_social, tb_empresas.nome_fantasia, tb_empresas.ie, tb_empresas.cnpj, tb_empresas.conta, tb_empresas.agencia, tb_empresas.site, tb_empresas.cep, tb_empresas.logradouro, tb_empresas.numero, tb_empresas.bairro, tb_empresas.complemento, tb_cidades.nome as cidade, tb_estados.uf as estado, date_format(tb_empresas.data_cadastro, "%d/%m/%Y às %H:%ih") as data_cadastro, tb_status_empresa.status_empresa as "status" from tb_empresas inner join tb_cidades inner join tb_estados inner join tb_status_empresa on (tb_empresas.cidade = tb_cidades.id) and (tb_empresas.estado = tb_estados.id) and (tb_empresas.id_status_empresa = tb_status_empresa.id) where tb_empresas.id = ? order by tb_empresas.razao_social',
+            [id]
+        )
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    erro: {
+                        status: 404,
+                        mensagem: 'Nenhum cadastro encontado.',
+                    },
+                });
+            }
+            return res.status(200).send({
+                resposta: {
+                    status: 200,
+                    registros: results.length,
+                    empresas: results.map((row) => {
+                        let url = { url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id };
+                        Object.assign(row, url);
+                        return row;
+                    }),
+                },
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    status: 500,
+                    mensagem: error,
+                },
+            });
+        });
+};
+
+//Retorna todos os contatos da empresa
+exports.contatos = (req, res, next) => {
+    const id_empresa = req.params.id_empresa;
+    mysql
+        .poolConnect('select id, numero, whatsapp from tb_contato_empresa where id_empresa = ?', [id_empresa])
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    erro: {
+                        status: 404,
+                        mensagem: 'Nenhum contato encontrado.',
+                    },
+                });
+            }
+            return res.status(200).send({
+                resposta: {
+                    status: 200,
+                    registros: results.length,
+                    contatos: results,
+                },
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    status: 500,
+                    mensagem: error,
+                },
+            });
+        });
+};
+
+//Anativa empresa conforme id fornecido
+exports.inativaEmpresa = (req, res, next) => {
+    const id_empresa = req.params.id_empresa;
+
+    mysql
+        .poolConnect('update tb_empresas set id_status_empresa = 3 where id = ?', [id_empresa])
+        .then((results) => {
+            if (results.affectedRows == 0) {
+                return res.status(404).send({
+                    erro: {
+                        status: 404,
+                        mensagem: 'Nenhum cadastro com o id fornecido foi encontrado para inativação da empresa.',
+                    },
+                });
+            }
+            return res.status(200).send({
+                resposta: {
+                    status: 200,
+                    mensagem: 'Inativacao efetuada com sucesso.',
+                },
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    status: 500,
+                    mensagem: error,
+                },
+            });
+        });
+};
+
+//Deleta contato conforme id
+exports.deletaContato = (req, res, next) => {
+    const id_contato = req.params.id_contato;
+    mysql
+        .poolConnect('delete from tb_contato_empresa where id = ?', [id_contato])
+        .then((results) => {
+            if (results.affectedRows == 0) {
+                return res.status(404).send({
+                    erro: {
+                        status: 404,
+                        mensagem: 'Nenhum contato com o id fornecido foi encontrado para exclusão.',
+                    },
+                });
+            }
+            return res.status(200).send({
+                resposta: {
+                    status: 200,
+                    mensagem: 'Contato excluído com sucesso.',
+                },
             });
         })
         .catch((error) => {

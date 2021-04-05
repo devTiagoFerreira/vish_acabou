@@ -2,7 +2,7 @@ const mysql = require('../mysql');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-//Login
+//Login Admin
 exports.login = (req, res, next) => {
     mysql
         .poolConnect('select id, email, nome, senha from tb_admin where email = ?', [req.body.email])
@@ -10,9 +10,7 @@ exports.login = (req, res, next) => {
             if (results < 1) {
                 return res.status(401).send({
                     erro: {
-                        status: 401,
-                        mensagem: 'Falha na autenticação.',
-                        motivo: 'Credenciais não cadastradas.',
+                        mensagem: 'Credenciais não cadastradas',
                     },
                 });
             }
@@ -20,18 +18,14 @@ exports.login = (req, res, next) => {
                 if (error) {
                     return res.status(401).send({
                         erro: {
-                            status: 401,
-                            mensagem: 'Falha na autenticação.',
-                            motivo: 'Credenciais não cadastradas.',
+                            mensagem: 'Credenciais não cadastradas',
                         },
                     });
                 }
                 if (!result) {
                     return res.status(401).send({
                         erro: {
-                            status: 401,
-                            mensagem: 'Falha na autenticação.',
-                            motivo: 'Credenciais não cadastradas.',
+                            mensagem: 'Credenciais não cadastradas',
                         },
                     });
                 }
@@ -40,27 +34,22 @@ exports.login = (req, res, next) => {
                     email: results[0].email,
                     nome: results[0].nome,
                 };
-                jwt.sign(token, process.env.VISH_SECRET_KEY, { expiresIn: '30m' }, (error, token) => {
+                jwt.sign(token, process.env.VISH_SECRET_KEY, { expiresIn: '1h' }, (error, token) => {
                     if (error) {
                         return res.status(500).send({
                             erro: {
-                                status: 500,
-                                mensagem: 'Falha na autenticação.',
-                                motivo: 'Erro interno no servidor.',
+                                mensagem: 'Erro no servidor',
                             },
                         });
                     }
                     return res.status(200).send({
-                        resposta: {
-                            status: 200,
-                            mensagem: 'Autenticação bem-sucedida.',
-                            token: token,
-                        },
+                        mensagem: 'Autenticação bem-sucedida',
+                        token: token,
                     });
                 });
             });
         })
         .catch((error) => {
-            return res.status(401).send({ erro: error });
+            return res.status(500).send({ erro: error });
         });
 };

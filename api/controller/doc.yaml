@@ -1,0 +1,187 @@
+swagger: "2.0"
+
+
+info:
+  version: "1.0.0"
+  title: "API Vish Acabou"
+  description: ""
+host: "localhost:8080"
+basePath: "/api"  
+
+schemes:
+  - "http"
+
+
+securityDefinitions:
+  bearerToken:
+    type: "apiKey"
+
+    name: "token"
+    in: "header"
+
+tags:
+  - name: "admin"
+    description: "Área Administrativa"
+
+paths:
+  /admin/login:
+    post:
+      tags:
+        - "admin"
+      summary: "Autenticação"
+      description: ""
+      operationId: "login"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "Login"
+          description: "Credenciais de acesso"
+          required: false
+          schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  example: "vishacabou@vishacabou.com.br"
+                senha:
+                  type: "string"
+                  example: "master1234"
+              required:
+                - email
+                - senha      
+      responses:
+        "200":
+          description: "Autenticação bem-sucedida"
+          schema:
+            type: "object"
+            properties:
+              mensagem:
+                type: "string"
+                example: "Autenticação bem-sucedida"
+              token:
+                type: "string"
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1h2WwiOiJ2aXNoYWNhYm91QHZpc2hhY2Fib3UuY29tLmJyIiwibm9tZSI6IlRpYWdvIiwiaWF0IjoxNjE3NTQ4MTczLCJleHAiOjE2MTc1NTE3NzN9.gs9Wd9DZQ98Z5SPJNqwMITJNj1dAKnGOzYjn4_m1fX0"
+        "401":
+          description: "Acesso não autorizado"
+        "500":
+          description: "Erro no servidor"
+
+  /admin/empresas/cadastro:
+      post:
+        tags:
+          - "admin"
+        summary: "Cadastro de Empresas"
+        description: ""
+        operationId: "cadastraEmpresa"
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        parameters:
+          - in: "body"
+            name: "Cadastro"
+            description: "Dados Cadastrais"
+            required: false
+            schema:
+                type: "object"
+                properties:
+                  email:
+                    type: "string"
+                    example: "vishacabou@vishacabou.com.br"
+                  senha:
+                    type: "string"
+                    example: "master1234"
+                  razao_social:
+                    type: "string"
+                    example: "Vish Acabou Compras Coletivas Ltda - Me"  
+                  nome_fantasia:
+                    type: "string"
+                    example: "Vish Acabou!"  
+                  ie:
+                    type: "string"
+                    example: "294.368.700.614"
+                  cnpj:
+                    type: "string"
+                    example: "01.252.551/0001-05"
+                  agencia:
+                    type: "string"
+                    example: "1234"  
+                  conta:
+                    type: "string"
+                    example: "12345-6"   
+                  site:
+                    type: "string"
+                    example: "http://vishacabou.com.br"
+                  cep:
+                    type: "string"
+                    example: "14710-026"
+                  logradouro:
+                    type: "string"
+                    example: "Rua A"  
+                  numero:
+                    type: "string"
+                    example: "123"
+                  bairro:
+                    type: "string"
+                    example: "Centro"
+                  complemento:
+                    type: "string"
+                    example: "2° andar, apartamento 30"
+                  cidade:
+                    type: "integer"
+                    example: 1441
+                    description: "ID referente"  
+                  estado:
+                    type: "integer"
+                    example: 26 
+                    description: "ID referente"  
+                  contatos:
+                    type: "object"
+                    properties:
+                      contato1:
+                        type: "object"
+                        properties:
+                          numero:
+                            type: "string"
+                            example: "(17) 3343-3477"
+                          whatsapp:
+                            type: "boolean"
+                            example: false
+                      contato2:
+                        type: "object"
+                        properties:
+                          numero:
+                            type: "string"
+                            example: "(17) 99143-7218"
+                          whatsapp:
+                            type: "boolean"
+                            example: true
+                    description: "Multiplos contatos permitidos"                     
+                required:
+                  - email
+                  - senha
+                  - razao_social
+                  - ie
+                  - cnpj
+                  - agencia
+                  - conta
+                  - cep 
+                  - logradouro
+                  - numero
+                  - bairro
+                  - cidade
+                  - estado
+                  - contatos
+        responses:
+          "201":
+            description: "Cadastro efetuado com sucesso"
+          "400":
+            description: "Dados inválidos ou não informados"
+          "422":
+            description: "Duplicidade de cadastro"   
+          "500":
+            description: "Erro no servidor" 
+

@@ -5,7 +5,7 @@ const auth = require('./middleware/auth');
 const routeAdminLogin = require('./admin-routes/admin-login');
 const routeAdminEmpresas = require('./admin-routes/admin-empresas');
 
-//Login
+//Login Admin
 router.use('/login', routeAdminLogin);
 
 //Empresa
