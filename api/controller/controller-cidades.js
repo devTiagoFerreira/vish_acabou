@@ -22,7 +22,7 @@ exports.cidadesGET = (req, res, next) => {
                             id: row.id,
                             nome: row.nome,
                             uf: row.uf,
-                            url: process.env.DOMAIN_PORT + 'cidades/' + row.id,
+                            url: process.env.DOMAIN + 'cidades/' + row.id,
                         };
                     }),
                 },
@@ -57,7 +57,7 @@ exports.cidadesGETUF = (req, res, next) => {
                             id: row.id,
                             nome: row.nome,
                             uf: row.uf,
-                            url: process.env.DOMAIN_PORT + 'cidades/' + row.id,
+                            url: process.env.DOMAIN + 'cidades/' + row.id,
                         };
                     }),
                 },
@@ -87,7 +87,7 @@ exports.cidadesGETId = (req, res, next) => {
                 resposta: {
                     status: 200,
                     registros: results.length,
-                    cidade: { id: results[0].id, nome: results[0].nome, uf: results[0].uf, url: process.env.DOMAIN_PORT + 'cidades/' + results[0].id },
+                    cidade: { id: results[0].id, nome: results[0].nome, uf: results[0].uf, url: process.env.DOMAIN + 'cidades/' + results[0].id },
                 },
             });
         })

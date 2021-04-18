@@ -184,4 +184,396 @@ paths:
             description: "Duplicidade de cadastro"   
           "500":
             description: "Erro no servidor" 
+        security:
+        - bearerToken: [] 
 
+  /admin/empresas/filtro:
+      post:
+        tags:
+          - "admin"
+        summary: "Retorna Todas as Empresas Cadastradas de Acordo com os Filtros - Dados Parciais"
+        description: ""
+        operationId: "filtroEmpresas"
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        parameters:
+          - in: "body"
+            name: "Filtros"
+            description: "Dados para Filtrar"
+            required: false
+            schema:
+                type: "object"
+                properties:
+                  palavra_chave:
+                    type: "string"
+                    example: "vish"
+                  id_cidade:
+                    type: "integer"
+                    example: 1441
+                  id_estado:
+                    type: "integer"
+                    example: 26 
+                  id_status:
+                    type: "integer"
+                    example: 1                 
+        responses:
+          "200":
+            description: "Dados retornados"
+          "404":
+            description: "Nenhum registro encontrado"    
+          "500":
+            description: "Erro no servidor"    
+        security:
+        - bearerToken: []              
+
+  /admin/empresas/{id_empresa}/contatos:
+    post:
+      tags:
+        - "admin"
+      summary: "Adiciona Novos Contatos"
+      description: ""
+      operationId: "addContatos"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "Email"
+          description: "Email de reenvio"
+          required: false
+          schema:
+              type: "object"
+              properties:
+                contatos:
+                  type: "object"
+                  properties:
+                    contato1:
+                      type: "object"
+                      properties:
+                        numero:
+                          type: "string"
+                          example: "(17) 3343-3477"
+                        whatsapp:
+                          type: "boolean"
+                          example: false
+                    contato2:
+                      type: "object"
+                      properties:
+                        numero:
+                          type: "string"
+                          example: "(17) 99143-7218"
+                        whatsapp:
+                          type: "boolean"
+                          example: true
+                  description: "Multiplos contatos permitidos"                     
+              required:
+                - contatos
+      responses:
+        "200":
+          description: "E-mail de confirmação reenviado com sucesso"
+        "400":
+          description: "Dados inválidos ou não informados"
+        "404":
+          description: "Nenhum registro encontrado"   
+        "500":
+          description: "Erro no servidor" 
+      security:
+        - bearerToken: []
+
+  /admin/empresas/reenviar-email:
+    post:
+      tags:
+        - "admin"
+      summary: "Reenvio de Emails"
+      description: ""
+      operationId: "reenviaEmail"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "Email"
+          description: "Email de reenvio"
+          required: false
+          schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  example: "vishacabou@vishacabou.com.br"
+              required:
+                - email 
+      responses:
+        "200":
+          description: "E-mail de confirmação reenviado com sucesso"
+        "400":
+          description: "Dados inválidos ou não informados"
+        "404":
+          description: "Nenhum registro encontrado"   
+        "500":
+          description: "Erro no servidor" 
+      security:
+        - bearerToken: []    
+
+  /admin/empresas/{id_empresa}/inativar:
+    patch:
+      tags:
+        - "admin"
+      summary: "Inativação de Empresas"
+      description: ""
+      operationId: "inativaEmpresa"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Inativacao efetuada com sucesso"
+        "404":
+          description: "Nenhum registro encontrado"   
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: []   
+
+  /admin/empresas/{id_empresa}/alterar-email:
+    patch:
+      tags:
+        - "admin"
+      summary: "Altera Email de Empresas"
+      description: ""
+      operationId: "alteraEmail"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "Email"
+          description: "Novo email"
+          required: false
+          schema:
+              type: "object"
+              properties:
+                novo_email:
+                  type: "string"
+                  example: "vishacabou@vishacabou.com.br"
+              required:
+                - email   
+      responses:
+        "200":
+          description: "Email alterado com sucesso"
+        "400":
+          description: "Dados inválidos ou não informados"  
+        "404":
+          description: "Nenhum registro encontrado"   
+        "422":
+          description: "Duplicidade de cadastro"  
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: []     
+        
+  /admin/empresas/{id_empresa}/atualizar-cadastro:
+    patch:
+      tags:
+        - "admin"
+      summary: "Atualiza Cadastro de Empresas"
+      description: ""
+      operationId: "alteraDadosCadastrais"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+          - in: "body"
+            name: "Cadastro"
+            description: "Dados Cadastrais"
+            required: false
+            schema:
+                type: "object"
+                properties:
+                  razao_social:
+                    type: "string"
+                    example: "Vish Acabou Compras Coletivas Ltda - Me"  
+                  nome_fantasia:
+                    type: "string"
+                    example: "Vish Acabou!"  
+                  ie:
+                    type: "string"
+                    example: "294.368.700.614"
+                  cnpj:
+                    type: "string"
+                    example: "01.252.551/0001-05"
+                  agencia:
+                    type: "string"
+                    example: "1234"  
+                  conta:
+                    type: "string"
+                    example: "12345-6"   
+                  site:
+                    type: "string"
+                    example: "http://vishacabou.com.br"
+                  cep:
+                    type: "string"
+                    example: "14710-026"
+                  logradouro:
+                    type: "string"
+                    example: "Rua A"  
+                  numero:
+                    type: "string"
+                    example: "123"
+                  bairro:
+                    type: "string"
+                    example: "Centro"
+                  complemento:
+                    type: "string"
+                    example: "2° andar, apartamento 30"
+                  cidade:
+                    type: "integer"
+                    example: 1441
+                    description: "ID referente"  
+                  estado:
+                    type: "integer"
+                    example: 26 
+                    description: "ID referente"                      
+                required:
+                  - razao_social
+                  - ie
+                  - cnpj
+                  - agencia
+                  - conta
+                  - cep 
+                  - logradouro
+                  - numero
+                  - bairro
+                  - cidade
+                  - estado
+      responses:
+        "200":
+          description: "Dados atualizados com sucesso"
+        "400":
+          description: "Dados inválidos ou não informados"  
+        "404":
+          description: "Nenhum registro encontrado"   
+        "422":
+          description: "Duplicidade de cadastro"  
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: []        
+
+  /admin/empresas/atualizar-contato/{id_contato}:
+    patch:
+      tags:
+        - "admin"
+      summary: "Atualiza Contato de Empresas"
+      description: ""
+      operationId: "atualizaContato"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+          - in: "body"
+            name: "Contato"
+            description: "Numero de contato"
+            required: false
+            schema:
+                type: "object"
+                properties:
+                  numero:
+                    type: "string"
+                    example: "(17) 00000-0000"  
+                  whatsapp:
+                    type: "boolean"
+                    example: true                     
+                required:
+                  - numero
+                  - whatsapp
+      responses:
+        "200":
+          description: "Cadastro atualizado com sucesso"
+        "400":
+          description: "Dados inválidos ou não informados"  
+        "404":
+          description: "Nenhum registro encontrado"    
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: []  
+        
+  /admin/empresas/{id_empresa}/logo:
+    patch:
+      tags:
+        - "admin"
+      summary: "Atualiza Logo de Empresas"
+      description: ""
+      operationId: "atualizaLogo"
+      consumes:
+        - "multipart/form-data"
+      produces:
+        - "application/json"
+      parameters:
+          - in: "formData"
+            name: "Logo"
+            description: "Apenas Extensão: image/webp ### Tamanho Máximo: 500 Kilobytes"
+            required: true
+            type: "file"                  
+      responses:
+        "200":
+          description: "Logo atualizada com sucesso"
+        "400":
+          description: "Dados inválidos ou não informados"  
+        "404":
+          description: "Nenhum registro encontrado"    
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: []
+
+  /admin/empresas:
+      get:
+        tags:
+          - "admin"
+        summary: "Retorna Todas as Empresas Cadastradas - Dados Parciais"
+        description: ""
+        operationId: "empresas"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "Dados retornados"
+          "404":
+            description: "Nenhum registro encontrado"    
+          "500":
+            description: "Erro no servidor"    
+        security:
+        - bearerToken: []  
+        
+  /admin/empresas/{id_empresa}:
+    get:
+      tags:
+        - "admin"
+      summary: "Retorna a Empresa Cadastrada de Acordo com o ID - Quase Todos os Dados"
+      description: ""
+      operationId: "idEmpresas"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "E-mail de confirmação reenviado com sucesso"
+        "400":
+          description: "Dados inválidos ou não informados"
+        "404":
+          description: "Nenhum registro encontrado"   
+        "500":
+          description: "Erro no servidor" 
+      security:
+        - bearerToken: []      
+        
+         

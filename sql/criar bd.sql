@@ -16,7 +16,7 @@ create table tb_empresas (
     logo varchar(100),
     razao_social varchar(100) not null,
     nome_fantasia varchar(100),
-    ie varchar(15) not null,
+    ie varchar(15) not null unique,
     cnpj varchar(18) not null unique,
     conta varchar(20) not null,
     agencia varchar(20) not null,
@@ -38,7 +38,7 @@ create table tb_empresas (
 create table tb_contato_empresa (
 	id int auto_increment not null primary key,
     id_empresa int not null,
-    telefone varchar(16),
-    whatsapp varchar(16),
+    numero varchar(16),
+    whatsapp bool,
     constraint FK_empresa foreign key (id_empresa) references tb_empresas(id)
 );

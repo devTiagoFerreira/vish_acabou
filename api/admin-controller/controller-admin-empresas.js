@@ -263,6 +263,48 @@ exports.cadastraEmpresa = (req, res, next) => {
         });
 };
 
+//Retorna todas as empresas cadastradas de acordo com os filtros - Dados parciais
+exports.filtroEmpresas = (req, res, next) => {
+    const chave = req.body.palavra_chave || '%';
+    const estado = req.body.id_estado || '%';
+    const cidade = req.body.id_cidade || '%';
+    const status = req.body.id_status || '%';
+    mysql
+        .poolLineToLine(
+            'select tb_empresas.logo, tb_empresas.id, tb_empresas.razao_social, tb_empresas.nome_fantasia, tb_cidades.nome as cidade, tb_estados.uf as estado, tb_status_empresa.status_empresa as "status" from tb_empresas inner join tb_cidades inner join tb_estados inner join tb_status_empresa on (tb_empresas.cidade = tb_cidades.id) and (tb_empresas.estado = tb_estados.id) and (tb_empresas.id_status_empresa = tb_status_empresa.id) where (tb_empresas.razao_social like "%"?"%" or tb_empresas.nome_fantasia like "%"?"%") and tb_estados.id like ? and tb_cidades.id like ? and tb_status_empresa.id like ? order by tb_empresas.razao_social',
+            [chave, chave, estado, cidade, status]
+        )
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    erro: {
+                        mensagem: 'Nenhum cadastro encontado',
+                    },
+                });
+            }
+            return res.status(200).send({
+                registros: results.length,
+                empresas: results.map((row) => {
+                    let logo = null;
+                    if (row.logo) {
+                        logo = { logo: process.env.DOMAIN + 'imagens/empresas/' + row.id + '/logo' };
+                    }
+                    Object.assign(row, logo);
+                    let url = { url: process.env.DOMAIN + 'admin/empresas/' + row.id };
+                    Object.assign(row, url);
+                    return row;
+                }),
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    mensagem: error,
+                },
+            });
+        });
+};
+
 //Adiciona novos contatos
 exports.addContatos = (req, res, next) => {
     const id_empresa = req.params.id_empresa;
@@ -343,14 +385,13 @@ exports.addContatos = (req, res, next) => {
 };
 
 //Reenvia e-mail de ativação de cadastro
-exports.reenviarEmail = (req, res, next) => {
+exports.reenviaEmail = (req, res, next) => {
     const email = req.body.email || null;
 
     if (!email) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'E-mail não informado.',
+                mensagem: 'E-mail não informado',
                 email: email,
             },
         });
@@ -359,8 +400,7 @@ exports.reenviarEmail = (req, res, next) => {
     if (!func.emailValidator(email)) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'O email informado é inválido.',
+                mensagem: 'O email informado é inválido',
                 email: email,
             },
         });
@@ -372,8 +412,7 @@ exports.reenviarEmail = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro com esse e-mail foi encontrado.',
+                        mensagem: 'Nenhum cadastro com esse e-mail foi encontrado',
                         email: email,
                     },
                 });
@@ -383,9 +422,8 @@ exports.reenviarEmail = (req, res, next) => {
                 if (error) {
                     return res.status(500).send({
                         erro: {
-                            status: 500,
-                            mensagem: 'Erro interno no servidor.',
-                            motivo: 'Erro na geração do token de confirmação.',
+                            mensagem: 'Erro interno no servidor',
+                            motivo: 'Erro na geração do token de confirmação',
                         },
                     });
                 }
@@ -409,17 +447,13 @@ exports.reenviarEmail = (req, res, next) => {
                     if (error) {
                         return res.status(500).send({
                             erro: {
-                                status: 500,
-                                mensagem: 'Erro interno no servidor.',
-                                motivo: 'Erro no envio do e-mail de confirmação.',
+                                mensagem: 'Erro interno no servidor',
+                                motivo: 'Erro no envio do e-mail de confirmação',
                             },
                         });
                     } else {
                         return res.status(200).send({
-                            resposta: {
-                                status: 200,
-                                mensagem: 'E-mail de confirmação reenviado com sucesso!',
-                            },
+                            mensagem: 'E-mail de confirmação reenviado com sucesso',
                         });
                     }
                 });
@@ -435,42 +469,50 @@ exports.reenviarEmail = (req, res, next) => {
         });
 };
 
+//Anativa empresa conforme id fornecido
+exports.inativaEmpresa = (req, res, next) => {
+    const id_empresa = req.params.id_empresa;
+
+    mysql
+        .poolConnect('update tb_empresas set id_status_empresa = 3 where id = ?', [id_empresa])
+        .then((results) => {
+            if (results.affectedRows == 0) {
+                return res.status(404).send({
+                    erro: {
+                        mensagem: 'Nenhum cadastro com o id fornecido foi encontrado para inativação da empresa',
+                    },
+                });
+            }
+            return res.status(200).send({
+                mensagem: 'Inativacao efetuada com sucesso',
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    mensagem: error,
+                },
+            });
+        });
+};
+
 //Altera e-mail
-exports.alterarEmail = (req, res, next) => {
-    const emailAtual = req.body.email_atual || null;
+exports.alteraEmail = (req, res, next) => {
+    const id_empresa = req.params.id_empresa;
     const novoEmail = req.body.novo_email || null;
 
-    if (!emailAtual) {
-        return res.status(400).send({
-            erro: {
-                status: 400,
-                mensagem: 'O e-mail atual não foi informado.',
-                email_atual: emailAtual,
-            },
-        });
-    }
     if (!novoEmail) {
         return res.status(400).send({
             erro: {
-                status: 400,
                 mensagem: 'O novo e-mail não foi informado.',
                 novo_email: novoEmail,
             },
         });
     }
-    if (!func.emailValidator(emailAtual)) {
-        return res.status(400).send({
-            erro: {
-                status: 400,
-                mensagem: 'O email atual informado é inválido.',
-                email_atual: emailAtual,
-            },
-        });
-    }
+
     if (!func.emailValidator(novoEmail)) {
         return res.status(400).send({
             erro: {
-                status: 400,
                 mensagem: 'O novo email informado é inválido.',
                 novo_email: novoEmail,
             },
@@ -482,21 +524,18 @@ exports.alterarEmail = (req, res, next) => {
             if (!results.length == 0) {
                 return res.status(422).send({
                     erro: {
-                        status: 422,
                         mensagem: 'Já existe um cadastro com o novo email informado.',
                         novo_email: novoEmail,
                     },
                 });
             }
             mysql
-                .poolConnect('select id from tb_empresas where email = ?', [emailAtual])
+                .poolConnect('select id from tb_empresas where id = ?', [id_empresa])
                 .then((results) => {
                     if (results.length == 0) {
                         return res.status(404).send({
                             erro: {
-                                status: 404,
-                                mensagem: 'Nenhum cadastro com esse e-mail foi encontrado.',
-                                email_atual: emailAtual,
+                                mensagem: 'Nenhum cadastro com o id fornecido foi encontrado',
                             },
                         });
                     }
@@ -511,9 +550,8 @@ exports.alterarEmail = (req, res, next) => {
                                 if (error) {
                                     return res.status(500).send({
                                         erro: {
-                                            status: 500,
-                                            mensagem: 'E-mail alterado com sucesso, porém houve uma falha no envio do e-mail de confirmação.',
-                                            motivo: 'Erro na geração do token de confirmação.',
+                                            mensagem: 'E-mail alterado com sucesso, porém houve uma falha no envio do e-mail de confirmação',
+                                            motivo: 'Erro na geração do token de confirmação',
                                         },
                                     });
                                 }
@@ -537,17 +575,13 @@ exports.alterarEmail = (req, res, next) => {
                                     if (error) {
                                         return res.status(500).send({
                                             erro: {
-                                                status: 500,
-                                                mensagem: 'E-mail alterado com sucesso, porém não foi possível enviar o e-mail de confirmação.',
-                                                motivo: 'Erro no envio do e-mail de confirmação.',
+                                                mensagem: 'E-mail alterado com sucesso, porém não foi possível enviar o e-mail de confirmação',
+                                                motivo: 'Erro no envio do e-mail de confirmação',
                                             },
                                         });
                                     } else {
-                                        return res.status(201).send({
-                                            resposta: {
-                                                status: 201,
-                                                mensagem: 'E-mail alterado com sucesso!',
-                                            },
+                                        return res.status(200).send({
+                                            mensagem: 'E-mail alterado com sucesso',
                                         });
                                     }
                                 });
@@ -556,7 +590,6 @@ exports.alterarEmail = (req, res, next) => {
                         .catch((error) => {
                             return res.status(500).send({
                                 erro: {
-                                    status: 500,
                                     mensagem: error,
                                 },
                             });
@@ -565,7 +598,6 @@ exports.alterarEmail = (req, res, next) => {
                 .catch((error) => {
                     return res.status(500).send({
                         erro: {
-                            status: 500,
                             mensagem: error,
                         },
                     });
@@ -574,7 +606,6 @@ exports.alterarEmail = (req, res, next) => {
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
@@ -582,7 +613,7 @@ exports.alterarEmail = (req, res, next) => {
 };
 
 //Atualiza os dados cadastrais da empresa conforme id
-exports.alterarDadosCadastrais = (req, res, next) => {
+exports.alteraDadosCadastrais = (req, res, next) => {
     const id_empresa = req.params.id_empresa;
 
     const empresa_geral = {
@@ -617,8 +648,7 @@ exports.alterarDadosCadastrais = (req, res, next) => {
         if (!empresa_obg[i]) {
             return res.status(400).send({
                 erro: {
-                    status: 400,
-                    mensagem: 'Campos obrigatórios incompletos.',
+                    mensagem: 'Campos obrigatórios incompletos',
                     campos_obrigatorios: {
                         razao_social: empresa_obg[0],
                         ie: empresa_obg[1],
@@ -643,8 +673,7 @@ exports.alterarDadosCadastrais = (req, res, next) => {
     if (!cnpj_valido) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'O CNPJ informado é inválido.',
+                mensagem: 'O CNPJ informado é inválido',
                 cnpj: empresa_obg[2],
             },
         });
@@ -657,8 +686,7 @@ exports.alterarDadosCadastrais = (req, res, next) => {
         if (!ie_valido) {
             return res.status(400).send({
                 erro: {
-                    status: 400,
-                    mensagem: 'A Inscrição Estadual informada é inválida.',
+                    mensagem: 'A Inscrição Estadual informada é inválida',
                     ie: empresa_obg[1],
                 },
             });
@@ -671,8 +699,7 @@ exports.alterarDadosCadastrais = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro encontado.',
+                        mensagem: 'Nenhum cadastro com o id fornecido foi encontrado',
                     },
                 });
             }
@@ -683,30 +710,26 @@ exports.alterarDadosCadastrais = (req, res, next) => {
                         if (results[0].ie == empresa_obg[1] && results[0].cnpj == empresa_obg[2]) {
                             return res.status(422).send({
                                 erro: {
-                                    status: 422,
-                                    mensagem: 'Inscrição Estadual e CNPJ já cadastrados.',
+                                    mensagem: 'Inscrição Estadual e CNPJ já cadastrados',
                                 },
                             });
                         } else if (results[0].ie == empresa_obg[1]) {
                             return res.status(422).send({
                                 erro: {
-                                    status: 422,
-                                    mensagem: 'Inscrição Estadual já cadastrada.',
+                                    mensagem: 'Inscrição Estadual já cadastrada',
                                 },
                             });
                         } else {
                             return res.status(422).send({
                                 erro: {
-                                    status: 422,
-                                    mensagem: 'CNPJ já cadastrado.',
+                                    mensagem: 'CNPJ já cadastrado',
                                 },
                             });
                         }
                     } else if (results.length > 1) {
                         return res.status(422).send({
                             erro: {
-                                status: 422,
-                                mensagem: 'Inscrição Estadual e CNPJ já cadastrados.',
+                                mensagem: 'Inscrição Estadual e CNPJ já cadastrados',
                             },
                         });
                     }
@@ -733,23 +756,20 @@ exports.alterarDadosCadastrais = (req, res, next) => {
                             if (results.affectedRows == 0) {
                                 return res.status(500).send({
                                     erro: {
-                                        status: 500,
-                                        mensagem: 'Alterações não efetuadas.',
-                                        motivo: 'Erro interno no servidor, erro na sintaxe de update SQL.',
+                                        mensagem: 'Alterações não efetuadas',
+                                        motivo: 'Erro interno no servidor, erro na sintaxe de update SQL',
                                     },
                                 });
                             }
                             return res.status(200).send({
                                 resposta: {
-                                    status: 200,
-                                    mensagem: 'Dados atualizados com sucesso.',
+                                    mensagem: 'Dados atualizados com sucesso',
                                 },
                             });
                         })
                         .catch((error) => {
                             return res.status(500).send({
                                 erro: {
-                                    status: 500,
                                     mensagem: error,
                                 },
                             });
@@ -758,7 +778,6 @@ exports.alterarDadosCadastrais = (req, res, next) => {
                 .catch((error) => {
                     return res.status(500).send({
                         erro: {
-                            status: 500,
                             mensagem: error,
                         },
                     });
@@ -767,7 +786,6 @@ exports.alterarDadosCadastrais = (req, res, next) => {
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
@@ -783,8 +801,7 @@ exports.atualizaContato = (req, res, next) => {
     if (!numero) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'Nenhum numero para contato fornecido.',
+                mensagem: 'Nenhum numero para contato fornecido',
                 contato: {
                     numero: numero,
                     whatsapp: whatsapp,
@@ -799,26 +816,21 @@ exports.atualizaContato = (req, res, next) => {
             if (results.affectedRows == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
                         mensagem: 'Nenhum contato com o id fornecido foi encontrado para atualização.',
                     },
                 });
             }
             return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    mensagem: 'Contato atualizado com sucesso.',
-                    contato: {
-                        numero: numero,
-                        whatsapp: whatsapp,
-                    },
+                mensagem: 'Contato atualizado com sucesso',
+                contato: {
+                    numero: numero,
+                    whatsapp: whatsapp,
                 },
             });
         })
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
@@ -826,7 +838,7 @@ exports.atualizaContato = (req, res, next) => {
 };
 
 //Atualiza a logo da empresa conforme o id
-exports.atualizarLogo = (req, res, next) => {
+exports.atualizaLogo = (req, res, next) => {
     const id_empresa = req.params.id_empresa;
 
     const storage = multer.diskStorage({
@@ -861,8 +873,7 @@ exports.atualizarLogo = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro com essa empresa foi encontrado.',
+                        mensagem: 'Nenhum cadastro com essa empresa foi encontrado',
                     },
                 });
             }
@@ -872,8 +883,7 @@ exports.atualizarLogo = (req, res, next) => {
                     if (error.code === 'LIMIT_FILE_SIZE') {
                         return res.status(400).send({
                             erro: {
-                                status: 400,
-                                mensagem: 'O tamanho do arquivo ultrapassou o limite permitido.',
+                                mensagem: 'O tamanho do arquivo ultrapassou o limite permitido',
                                 limite: 500 + ' kilobytes',
                             },
                         });
@@ -886,7 +896,6 @@ exports.atualizarLogo = (req, res, next) => {
                     // Ocorreu um erro desconhecido durante o upload.
                     return res.status(400).send({
                         erro: {
-                            status: 400,
                             mensagem: error.message,
                         },
                     });
@@ -894,8 +903,7 @@ exports.atualizarLogo = (req, res, next) => {
                 if (!req.file) {
                     return res.status(400).send({
                         erro: {
-                            status: 400,
-                            mensagem: 'Nenhum arquivo foi enviado.',
+                            mensagem: 'Nenhum arquivo foi enviado',
                         },
                     });
                 }
@@ -914,34 +922,24 @@ exports.atualizarLogo = (req, res, next) => {
                                             erro: error,
                                         });
                                     }
-                                    return res.status(201).send({
-                                        resposta: {
-                                            status: 201,
-                                            mensagem: 'Logo atualizada com sucesso.',
-                                        },
+                                    return res.status(200).send({
+                                        mensagem: 'Logo atualizada com sucesso',
                                     });
                                 });
                             } else {
-                                return res.status(201).send({
-                                    resposta: {
-                                        status: 201,
-                                        mensagem: 'Logo atualizada com sucesso.',
-                                    },
+                                return res.status(200).send({
+                                    mensagem: 'Logo atualizada com sucesso',
                                 });
                             }
                         } else {
-                            return res.status(201).send({
-                                resposta: {
-                                    status: 201,
-                                    mensagem: 'Logo atualizada com sucesso.',
-                                },
+                            return res.status(200).send({
+                                mensagem: 'Logo atualizada com sucesso',
                             });
                         }
                     })
                     .catch((error) => {
                         return res.status(500).send({
                             erro: {
-                                status: 500,
                                 mensagem: error,
                             },
                         });
@@ -951,7 +949,6 @@ exports.atualizarLogo = (req, res, next) => {
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
@@ -968,76 +965,33 @@ exports.empresas = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro encontado.',
+                        mensagem: 'Nenhum cadastro encontado',
                     },
                 });
             }
             return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    registros: results.length,
-                    empresas: results.map((row) => {
-                        return {
-                            id: row.id,
-                            logo: row.logo,
-                            razao_social: row.razao_social,
-                            nome_fantasia: row.nome_fantasia,
-                            cidade: row.cidade,
-                            estado: row.estado,
-                            status: row.status,
-                            url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id,
-                        };
-                    }),
-                },
+                registros: results.length,
+                empresas: results.map((row) => {
+                    let logo = null;
+                    if (row.logo) {
+                        logo = process.env.DOMAIN + 'imagens/empresas/' + row.id + '/logo';
+                    }
+                    return {
+                        id: row.id,
+                        logo: logo,
+                        razao_social: row.razao_social,
+                        nome_fantasia: row.nome_fantasia,
+                        cidade: row.cidade,
+                        estado: row.estado,
+                        status: row.status,
+                        url: process.env.DOMAIN + 'admin/empresas/' + row.id,
+                    };
+                }),
             });
         })
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
-                    mensagem: error,
-                },
-            });
-        });
-};
-
-//Retorna todas as empresas cadastradas de acordo com os filtros - Dados parciais
-exports.filtroEmpresas = (req, res, next) => {
-    const chave = req.body.palavra_chave || '%';
-    const estado = req.body.id_estado || '%';
-    const cidade = req.body.id_cidade || '%';
-    const status = req.body.id_status || '%';
-    mysql
-        .poolLineToLine(
-            'select tb_empresas.logo, tb_empresas.id, tb_empresas.razao_social, tb_empresas.nome_fantasia, tb_cidades.nome as cidade, tb_estados.uf as estado, tb_status_empresa.status_empresa as "status" from tb_empresas inner join tb_cidades inner join tb_estados inner join tb_status_empresa on (tb_empresas.cidade = tb_cidades.id) and (tb_empresas.estado = tb_estados.id) and (tb_empresas.id_status_empresa = tb_status_empresa.id) where (tb_empresas.razao_social like "%"?"%" or tb_empresas.nome_fantasia like "%"?"%") and tb_estados.id like ? and tb_cidades.id like ? and tb_status_empresa.id like ? order by tb_empresas.razao_social',
-            [chave, chave, estado, cidade, status]
-        )
-        .then((results) => {
-            if (results.length == 0) {
-                return res.status(404).send({
-                    erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro encontado.',
-                    },
-                });
-            }
-            return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    registros: results.length,
-                    empresas: results.map((row) => {
-                        let url = { url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id };
-                        Object.assign(row, url);
-                        return row;
-                    }),
-                },
-            });
-        })
-        .catch((error) => {
-            return res.status(500).send({
-                erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
@@ -1056,27 +1010,27 @@ exports.idEmpresas = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro encontado.',
+                        mensagem: 'Nenhum cadastro encontado',
                     },
                 });
             }
             return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    registros: results.length,
-                    empresas: results.map((row) => {
-                        let url = { url: process.env.DOMAIN_PORT + 'admin/empresas/' + row.id };
-                        Object.assign(row, url);
-                        return row;
-                    }),
-                },
+                registros: results.length,
+                empresas: results.map((row) => {
+                    let logo = null;
+                    if (row.logo) {
+                        logo = { logo: process.env.DOMAIN + 'imagens/empresas/' + row.id + '/logo'};
+                    }
+                    Object.assign(row, logo);
+                    let url = { url: process.env.DOMAIN + 'admin/empresas/' + row.id };
+                    Object.assign(row, url);
+                    return row;
+                }),
             });
         })
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
@@ -1102,38 +1056,6 @@ exports.contatos = (req, res, next) => {
                     status: 200,
                     registros: results.length,
                     contatos: results,
-                },
-            });
-        })
-        .catch((error) => {
-            return res.status(500).send({
-                erro: {
-                    status: 500,
-                    mensagem: error,
-                },
-            });
-        });
-};
-
-//Anativa empresa conforme id fornecido
-exports.inativaEmpresa = (req, res, next) => {
-    const id_empresa = req.params.id_empresa;
-
-    mysql
-        .poolConnect('update tb_empresas set id_status_empresa = 3 where id = ?', [id_empresa])
-        .then((results) => {
-            if (results.affectedRows == 0) {
-                return res.status(404).send({
-                    erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro com o id fornecido foi encontrado para inativação da empresa.',
-                    },
-                });
-            }
-            return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    mensagem: 'Inativacao efetuada com sucesso.',
                 },
             });
         })

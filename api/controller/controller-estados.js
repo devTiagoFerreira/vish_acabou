@@ -22,7 +22,7 @@ exports.estadosGET = (req, res, next) => {
                             id: row.id,
                             nome: row.nome,
                             uf: row.uf,
-                            url: process.env.DOMAIN_PORT + 'estados/' + row.id,
+                            url: process.env.DOMAIN + 'estados/' + row.id,
                         };
                     }),
                 },
@@ -52,7 +52,7 @@ exports.estadosGETId = (req, res, next) => {
                 resposta: {
                     status: 200,
                     registros: results.length,
-                    estado: { id: results[0].id, nome: results[0].nome, uf: results[0].uf, url: process.env.DOMAIN_PORT + 'estados/' + results[0].id },
+                    estado: { id: results[0].id, nome: results[0].nome, uf: results[0].uf, url: process.env.DOMAIN + 'estados/' + results[0].id },
                 },
             });
         })
