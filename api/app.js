@@ -30,14 +30,14 @@ app.use((req, res, next) => {
 //Rotas
 app.use('/api/docs', routeDoc);
 app.use('/api/admin', routeAdmin);
-app.use('/api/estados', routeEstados);
-app.use('/api/cidades', routeCidades);
-app.use('/api/validador', routeValidador);
 app.use('/api/empresas', routeEmpresas);
+app.use('/api/cidades', routeCidades);
+app.use('/api/estados', routeEstados);
 app.use('/api/imagens', routeImagens);
+app.use('/api/validador', routeValidador);
 
 app.use((req, res, next) => {
-    const erro = new Error('Rota não encontrada.');
+    const erro = new Error('Rota não encontrada');
     erro.status = 404;
     next(erro);
 });
@@ -46,7 +46,6 @@ app.use((error, req, res, next) => {
     res.status(error.status || 500);
     return res.send({
         erro: {
-            status: error.status,
             mensagem: error.message,
         },
     });

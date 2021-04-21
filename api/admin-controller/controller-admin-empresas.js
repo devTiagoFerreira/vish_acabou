@@ -1019,7 +1019,7 @@ exports.idEmpresas = (req, res, next) => {
                 empresas: results.map((row) => {
                     let logo = null;
                     if (row.logo) {
-                        logo = { logo: process.env.DOMAIN + 'imagens/empresas/' + row.id + '/logo'};
+                        logo = { logo: process.env.DOMAIN + 'imagens/empresas/' + row.id + '/logo' };
                     }
                     Object.assign(row, logo);
                     let url = { url: process.env.DOMAIN + 'admin/empresas/' + row.id };
@@ -1078,22 +1078,17 @@ exports.deletaContato = (req, res, next) => {
             if (results.affectedRows == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'Nenhum contato com o id fornecido foi encontrado para exclusão.',
+                        mensagem: 'Nenhum contato com o id fornecido foi encontrado para exclusão',
                     },
                 });
             }
             return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    mensagem: 'Contato excluído com sucesso.',
-                },
+                mensagem: 'Contato excluído com sucesso',
             });
         })
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
@@ -1109,7 +1104,6 @@ exports.deletaLogo = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
                         mensagem: 'Nenhum cadastro com essa empresa foi encontrado.',
                     },
                 });
@@ -1117,7 +1111,6 @@ exports.deletaLogo = (req, res, next) => {
             if (results[0].logo === null) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
                         mensagem: 'Não existe nenhum arquivo para ser deletado.',
                     },
                 });
@@ -1130,10 +1123,7 @@ exports.deletaLogo = (req, res, next) => {
                     const logoExists = fs.existsSync(urlLogo);
                     if (!logoExists) {
                         return res.status(200).send({
-                            resposta: {
-                                status: 200,
-                                mensagem: 'Logo deletada com sucesso.',
-                            },
+                            mensagem: 'Logo excluída com sucesso.',
                         });
                     }
                     fs.unlink(urlLogo, (error) => {
@@ -1143,17 +1133,13 @@ exports.deletaLogo = (req, res, next) => {
                             });
                         }
                         return res.status(200).send({
-                            resposta: {
-                                status: 200,
-                                mensagem: 'Logo deletada com sucesso.',
-                            },
+                            mensagem: 'Logo excluída com sucesso.',
                         });
                     });
                 })
                 .catch((error) => {
                     return res.status(500).send({
                         erro: {
-                            status: 500,
                             mensagem: error,
                         },
                     });
@@ -1162,7 +1148,6 @@ exports.deletaLogo = (req, res, next) => {
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });

@@ -39,12 +39,12 @@ router.get('/', empresas.empresas);
 router.get('/:id', empresas.idEmpresas);
 
 //Retorna todos os contatos da empresa
-router.get('/:id_empresa/contatos', empresas.contatos);
+router.get('/:id_empresa/exibir-contatos', empresas.contatos);
 
 //Deleta contato conforme id
 router.delete('/contatos/:id_contato', empresas.deletaContato);
 
 //Deleta a logo da empresa conforme o id
-router.delete('/:id_empresa/logo', empresas.deletaLogo);
+router.delete('/:id_empresa/deleta-logo', empresas.deletaLogo);
 
 module.exports = router;

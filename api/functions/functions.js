@@ -83,9 +83,9 @@ exports.emailValidator = (email) => {
 exports.verificaSeContatoExiste = (contatos = {}) => {
     let contato = {};
     for (let i = 0; i < Object.keys(contatos).length; i++) {
-        let whatsapp = contatos[Object.keys(contatos)[i]].whatsapp || false
+        let whatsapp = contatos[Object.keys(contatos)[i]].whatsapp || false;
         if (contatos[Object.keys(contatos)[i]].numero) {
-            contato[Object.keys(contatos)[i]] = {numero: contatos[Object.keys(contatos)[i]].numero, whatsapp: whatsapp};
+            contato[Object.keys(contatos)[i]] = { numero: contatos[Object.keys(contatos)[i]].numero, whatsapp: whatsapp };
         }
     }
     return contato;

@@ -9,8 +9,8 @@ exports.adminAuth = (req, res, next) => {
     } catch {
         return res.status(401).send({
             erro: {
-                mensagem: 'Falha na autenticação.',
-                motivo: 'Token não informado, não autorizado ou expirado.',
+                mensagem: 'Falha na autenticação',
+                motivo: 'Token não informado, não autorizado ou expirado',
             },
         });
     }
@@ -36,8 +36,8 @@ exports.empresaAuth = (req, res, next) => {
     } catch {
         return res.status(401).send({
             erro: {
-                mensagem: 'Falha na autenticação.',
-                motivo: 'Token não informado, não autorizado ou expirado.',
+                mensagem: 'Falha na autenticação',
+                motivo: 'Token não informado, não autorizado ou expirado',
             },
         });
     }

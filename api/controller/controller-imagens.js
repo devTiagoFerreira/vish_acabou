@@ -13,8 +13,7 @@ exports.empresaLogo = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro com essa empresa foi encontrado.',
+                        mensagem: 'Nenhum cadastro com essa empresa foi encontrado',
                     },
                 });
             }
@@ -22,11 +21,10 @@ exports.empresaLogo = (req, res, next) => {
             const url = './img/empresa/logo';
             const logo = results[0].logo || 'logo.webp';
             const logoPath = path.join(url, logo);
-            if(!fs.existsSync(logoPath)) {
+            if (!fs.existsSync(logoPath)) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'O arquivo não existe no servidor.',
+                        mensagem: 'O arquivo não existe no servidor',
                     },
                 });
             }
@@ -43,26 +41,8 @@ exports.empresaLogo = (req, res, next) => {
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
         });
 };
-/*
-
-app.get('/download', function(req, res){
-
-  var file = //carrega seu arquivo;
-
-  var filename = path.basename(file);
-  var mimetype = mime.lookup(file);
-
-  res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-  res.setHeader('Content-type', mimetype);
-
-  var filestream = fs.createReadStream(file);
-  filestream.pipe(res);
-});
-
-*/

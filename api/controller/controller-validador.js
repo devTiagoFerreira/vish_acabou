@@ -7,16 +7,12 @@ exports.cnpjValidator = (req, res, next) => {
     if (!cnpj_valido) {
         res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'CNPJ inválido.',
+                mensagem: 'CNPJ inválido',
             },
         });
     }
     res.status(200).send({
-        erro: {
-            status: 200,
-            mensagem: 'CNPJ válido.',
-        },
+        mensagem: 'CNPJ válido.',
     });
 };
 
@@ -27,15 +23,11 @@ exports.ieValidator = (req, res, next) => {
     if (!ie_valido) {
         res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'Inscrição Estadual inválida.',
+                mensagem: 'Inscrição Estadual inválida',
             },
         });
     }
     res.status(200).send({
-        erro: {
-            status: 200,
-            mensagem: 'Inscrição Estadual válida.',
-        },
+        mensagem: 'Inscrição Estadual válida',
     });
 };

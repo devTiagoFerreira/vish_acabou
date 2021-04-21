@@ -4,7 +4,7 @@ const empresas = require('../controller/controller-empresas');
 const auth = require('../middleware/auth');
 
 //Login
-router.get('/login', empresas.login);
+router.post('/login', empresas.login);
 
 //Ativação de cadastro
 router.patch('/ativar', auth.empresaAuth, empresas.validarEmail);

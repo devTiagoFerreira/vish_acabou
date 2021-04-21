@@ -11,7 +11,6 @@ exports.login = (req, res, next) => {
             if (results < 1) {
                 return res.status(401).send({
                     erro: {
-                        status: 401,
                         mensagem: 'Falha na autenticação',
                         motivo: 'Credenciais não cadastradas',
                     },
@@ -21,7 +20,6 @@ exports.login = (req, res, next) => {
                 if (error) {
                     return res.status(401).send({
                         erro: {
-                            status: 401,
                             mensagem: 'Falha na autenticação',
                             motivo: 'Credenciais não cadastradas',
                         },
@@ -30,7 +28,6 @@ exports.login = (req, res, next) => {
                 if (!result) {
                     return res.status(401).send({
                         erro: {
-                            status: 401,
                             mensagem: 'Falha na autenticação',
                             motivo: 'Credenciais não cadastradas',
                         },
@@ -45,18 +42,14 @@ exports.login = (req, res, next) => {
                     if (error) {
                         return res.status(500).send({
                             erro: {
-                                status: 500,
                                 mensagem: 'Falha na autenticação',
                                 motivo: 'Erro interno no servidor',
                             },
                         });
                     }
                     return res.status(200).send({
-                        resposta: {
-                            status: 200,
-                            mensagem: 'Autenticação bem-sucedida',
-                            token: token,
-                        },
+                        mensagem: 'Autenticação bem-sucedida',
+                        token: token,
                     });
                 });
             });
@@ -72,8 +65,7 @@ exports.validarEmail = (req, res, next) => {
     if (!token) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'Token de ativação de e-mail não informado.',
+                mensagem: 'Token de ativação de e-mail não informado',
             },
         });
     }
@@ -81,16 +73,14 @@ exports.validarEmail = (req, res, next) => {
         if (error) {
             return res.status(401).send({
                 erro: {
-                    status: 401,
-                    mensagem: 'Token de ativação de e-mail não autorizado ou expirado.',
+                    mensagem: 'Token de ativação de e-mail não autorizado ou expirado',
                 },
             });
         }
         if (decode.id != req.usuario.id) {
             return res.status(401).send({
                 erro: {
-                    status: 401,
-                    mensagem: 'Token de ativação de e-mail inválido.',
+                    mensagem: 'Token de ativação de e-mail inválido',
                 },
             });
         }
@@ -100,24 +90,21 @@ exports.validarEmail = (req, res, next) => {
                 if (results.length == 0) {
                     return res.status(401).send({
                         erro: {
-                            status: 401,
-                            mensagem: 'Token de ativação de e-mail inválido.',
+                            mensagem: 'Token de ativação de e-mail inválido',
                         },
                     });
                 }
                 if (decode.email != results[0].email) {
                     return res.status(401).send({
                         erro: {
-                            status: 401,
-                            mensagem: 'Token de ativação de e-mail inválido.',
+                            mensagem: 'Token de ativação de e-mail inválido',
                         },
                     });
                 }
                 if (results[0].id_status_empresa != 1) {
                     return res.status(401).send({
                         erro: {
-                            status: 401,
-                            mensagem: 'Token de ativação de e-mail inválido.',
+                            mensagem: 'Token de ativação de e-mail inválido',
                         },
                     });
                 }
@@ -144,17 +131,13 @@ exports.validarEmail = (req, res, next) => {
                             if (error) {
                                 return res.status(500).send({
                                     erro: {
-                                        status: 500,
                                         mensagem: 'Cadastro ativado com sucesso, porém não foi possível enviar o email de aviso.',
                                         motivo: 'Erro no envio do e-mail de aviso.',
                                     },
                                 });
                             } else {
-                                return res.status(201).send({
-                                    resposta: {
-                                        status: 201,
-                                        mensagem: 'Cadastro ativado com sucesso!',
-                                    },
+                                return res.status(200).send({
+                                    mensagem: 'Cadastro ativado com sucesso!',
                                 });
                             }
                         });
@@ -162,7 +145,6 @@ exports.validarEmail = (req, res, next) => {
                     .catch((error) => {
                         return res.status(500).send({
                             erro: {
-                                status: 500,
                                 mensagem: error,
                             },
                         });
@@ -171,7 +153,6 @@ exports.validarEmail = (req, res, next) => {
             .catch((error) => {
                 return res.status(500).send({
                     erro: {
-                        status: 500,
                         mensagem: error,
                     },
                 });

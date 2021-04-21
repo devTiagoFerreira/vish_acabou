@@ -22,8 +22,21 @@ securityDefinitions:
 tags:
   - name: "admin"
     description: "Área Administrativa"
+  - name: "empresas"
+    description: "Área Empresarial"
+  - name: "cidades"
+    description: "Cidades do Brasil" 
+  - name: "estados"
+    description: "Estados do Brasil" 
+  - name: "imagens"
+    description: "Servidor de Imagens"
+  - name: "validador"
+    description: "Valida Dados"          
 
 paths:
+
+  ## ADMIN    
+
   /admin/login:
     post:
       tags:
@@ -566,14 +579,290 @@ paths:
         - "application/json"
       responses:
         "200":
-          description: "E-mail de confirmação reenviado com sucesso"
-        "400":
-          description: "Dados inválidos ou não informados"
+          description: "Dados retornados"
         "404":
           description: "Nenhum registro encontrado"   
         "500":
           description: "Erro no servidor" 
       security:
-        - bearerToken: []      
+        - bearerToken: [] 
         
-         
+  /admin/empresas/{id_empresa}/exibir-contatos:
+    get:
+      tags:
+        - "admin"
+      summary: "Retorna Todos os Contatos da Empresa"
+      description: ""
+      operationId: "contatos"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Dados retornados" 
+        "404":
+          description: "Nenhum registro encontrado"    
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: []  
+        
+  /admin/empresas/contatos/{id_contato}:
+    delete:
+      tags:
+        - "admin"
+      summary: "Deleta Contato Conforme ID"
+      description: ""
+      operationId: "deletaContato"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Contato excluído com sucesso" 
+        "404":
+          description: "Nenhum registro encontrado"    
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: [] 
+        
+  /admin/empresas/{id_empresa}/deleta-logo:
+    delete:
+      tags:
+        - "admin"
+      summary: "Deleta Logo Conforme ID da Empresa Fornecido"
+      description: ""
+      operationId: "deletaLogo"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Logo excluída com sucesso" 
+        "404":
+          description: "Nenhum registro encontrado"    
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: []  
+
+## EMPRESAS        
+        
+  /empresas/login:
+    post:
+      tags:
+        - "empresas"
+      summary: "Autenticação Empresas"
+      description: ""
+      operationId: "login"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "Login"
+          description: "Credenciais de acesso"
+          required: false
+          schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  example: "usuario@gmail.com"
+                senha:
+                  type: "string"
+                  example: "master1234"
+              required:
+                - email
+                - senha      
+      responses:
+        "200":
+          description: "Autenticação bem-sucedida"
+          schema:
+            type: "object"
+            properties:
+              mensagem:
+                type: "string"
+                example: "Autenticação bem-sucedida"
+              token:
+                type: "string"
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1h2WwiOiJ2aXNoYWNhYm91QHZpc2hhY2Fib3UuY29tLmJyIiwibm9tZSI6IlRpYWdvIiwiaWF0IjoxNjE3NTQ4MTczLCJleHAiOjE2MTc1NTE3NzN9.gs9Wd9DZQ98Z5SPJNqwMITJNj1dAKnGOzYjn4_m1fX0"
+        "401":
+          description: "Acesso não autorizado"
+        "500":
+          description: "Erro no servidor"   
+          
+  /empresas/ativar:
+    patch:
+      tags:
+        - "empresas"
+      summary: "Validação de Email Empresarial"
+      description: ""
+      operationId: "validarEmail"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "Ativar"
+          description: "Token de ativação de email"
+          required: false
+          schema:
+              type: "object"
+              properties:
+                token_ativacao:
+                  type: "string"
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzIsImVtYWlsIjoidGlhZ284OC5kZXZAZ21haWwuY29tIiwiaWF0IjoxNjE2ODY0MzcwLCJleHAiOjE2MTc0NjkxNzB9.iRAFXm_6S1cDtRatZKLb1KbixxksAa9qbnFUG3SmLuc"
+              required:
+                - token_ativacao     
+      responses:
+        "200":
+          description: "Cadastro ativado com sucesso" 
+        "400":
+          description: "Dados inválidos ou não informados"   
+        "401":
+          description: "Não autorizado"   
+        "500":
+          description: "Erro no servidor"         
+      security:
+        - bearerToken: []    
+
+## CIDADES            
+
+  /cidades:
+      get:
+        tags:
+          - "cidades"
+        summary: "Retorna Todas as Cidades"
+        description: ""
+        operationId: "cidadesGET"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "Dados retornados"
+          "404":
+            description: "Nenhum registro encontrado"    
+          "500":
+            description: "Erro no servidor"             
+        
+  /cidades/uf/{id_uf}:
+      get:
+        tags:
+          - "cidades"
+        summary: "Retorna Todas as Cidades Conforme o ID fornecido do Estado"
+        description: ""
+        operationId: "cidadesGETUF"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "Dados retornados"
+          "404":
+            description: "Nenhum registro encontrado"    
+          "500":
+            description: "Erro no servidor" 
+            
+  /cidades/{id_cidade}:
+      get:
+        tags:
+          - "cidades"
+        summary: "Retorna a Cidade Conforme o ID Fornecido"
+        description: ""
+        operationId: "cidadesGETId"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "Dados retornados"
+          "404":
+            description: "Nenhum registro encontrado"    
+          "500":
+            description: "Erro no servidor"          
+        
+## ESTADOS
+
+  /estados:
+      get:
+        tags:
+          - "estados"
+        summary: "Retorna Todos os Estados"
+        description: ""
+        operationId: "estadosGET"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "Dados retornados"
+          "404":
+            description: "Nenhum registro encontrado"    
+          "500":
+            description: "Erro no servidor"
+
+  /estados/{id_estado}:
+      get:
+        tags:
+          - "estados"
+        summary: "Retorna o Estado Conforme o ID Fornecido"
+        description: ""
+        operationId: "estadosGETId"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "Dados retornados"
+          "404":
+            description: "Nenhum registro encontrado"    
+          "500":
+            description: "Erro no servidor"          
+
+## IMAGENS           
+
+  /imagens/empresas/{id_empresa}/logo:
+      get:
+        tags:
+          - "imagens"
+        summary: "Retorna a Logo Conforme ID da Empresa Fornecido"
+        description: ""
+        operationId: "empresaLogo"
+        produces:
+          - "multipart/form-data"
+        responses:
+          "200":
+            description: "Logo retornada"
+          "404":
+            description: "Nenhum registro encontrado"    
+          "500":
+            description: "Erro no servidor"
+
+## VALIDADOR            
+
+  /validador/cnpj/{cnpj}:
+      get:
+        tags:
+          - "validador"
+        summary: "Valida CNPJ"
+        description: ""
+        operationId: "cnpjValidator"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "CNPJ válido"
+          "400":
+            description: "CNPJ inválido"  
+  
+  /validador/ie/{ie}:
+      get:
+        tags:
+          - "validador"
+        summary: "Valida Inscrição Estadual"
+        description: ""
+        operationId: "ieValidator"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "Inscrição Estadual válida"
+          "400":
+            description: "Inscrição Estadual inválida"           
