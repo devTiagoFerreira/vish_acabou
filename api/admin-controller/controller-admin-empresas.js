@@ -313,8 +313,7 @@ exports.addContatos = (req, res, next) => {
     if (!contatos || Object.keys(contatos).length == 0) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'Informe um número de telefone para contato.',
+                mensagem: 'Informe um número de telefone para contato',
                 contatos: contatos,
             },
         });
@@ -325,8 +324,7 @@ exports.addContatos = (req, res, next) => {
     if (Object.keys(contatos).length == 0) {
         return res.status(400).send({
             erro: {
-                status: 400,
-                mensagem: 'Informe um número de telefone para contato.',
+                mensagem: 'Informe um número de telefone para contato',
                 contatos: contatos,
             },
         });
@@ -338,8 +336,7 @@ exports.addContatos = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        status: 404,
-                        mensagem: 'Nenhum cadastro com o id fornecido foi encontrado.',
+                        mensagem: 'Nenhum cadastro com o id fornecido foi encontrado',
                     },
                 });
             }
@@ -355,21 +352,17 @@ exports.addContatos = (req, res, next) => {
                     } catch {
                         return res.status(500).send({
                             erro: {
-                                status: 500,
-                                mensagem: 'Não foi possível adicionar os dados.',
+                                mensagem: 'Não foi possível adicionar os dados',
                             },
                         });
                     }
                 }
                 return res.status(201).send({
-                    resposta: {
-                        status: 201,
-                        mensagem: 'Dados adicionados com sucesso.',
-                        empresa: {
-                            id: results[0].id,
-                            razao_social: results[0].razao_social,
-                            contatos: contatos,
-                        },
+                    mensagem: 'Dados adicionados com sucesso',
+                    empresa: {
+                        id: results[0].id,
+                        razao_social: results[0].razao_social,
+                        contatos: contatos,
                     },
                 });
             })();
@@ -377,7 +370,6 @@ exports.addContatos = (req, res, next) => {
         .catch((error) => {
             return res.status(500).send({
                 erro: {
-                    status: 500,
                     mensagem: error,
                 },
             });
@@ -1104,7 +1096,7 @@ exports.deletaLogo = (req, res, next) => {
             if (results.length == 0) {
                 return res.status(404).send({
                     erro: {
-                        mensagem: 'Nenhum cadastro com essa empresa foi encontrado.',
+                        mensagem: 'Nenhum cadastro com essa empresa foi encontrado',
                     },
                 });
             }
@@ -1123,7 +1115,7 @@ exports.deletaLogo = (req, res, next) => {
                     const logoExists = fs.existsSync(urlLogo);
                     if (!logoExists) {
                         return res.status(200).send({
-                            mensagem: 'Logo excluída com sucesso.',
+                            mensagem: 'Logo excluída com sucesso',
                         });
                     }
                     fs.unlink(urlLogo, (error) => {
@@ -1133,7 +1125,7 @@ exports.deletaLogo = (req, res, next) => {
                             });
                         }
                         return res.status(200).send({
-                            mensagem: 'Logo excluída com sucesso.',
+                            mensagem: 'Logo excluída com sucesso',
                         });
                     });
                 })

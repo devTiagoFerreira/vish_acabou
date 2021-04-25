@@ -90,3 +90,12 @@ exports.verificaSeContatoExiste = (contatos = {}) => {
     }
     return contato;
 };
+
+exports.verificaObjetoVazio = (objeto = {}) => {
+    for (let i = 0; i < Object.keys(objeto).length; i++) {
+        if (!objeto[Object.keys(objeto)[i]]) {
+            return false;
+        }
+    }
+    return true;
+};

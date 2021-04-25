@@ -35,7 +35,7 @@ tags:
 
 paths:
 
-  ## ADMIN    
+## ADMIN    
 
   /admin/login:
     post:
@@ -81,6 +81,8 @@ paths:
           description: "Acesso não autorizado"
         "500":
           description: "Erro no servidor"
+
+## ADMIN EMPRESAS
 
   /admin/empresas/cadastro:
       post:
@@ -642,7 +644,79 @@ paths:
         "500":
           description: "Erro no servidor"         
       security:
-        - bearerToken: []  
+        - bearerToken: [] 
+        
+## ADMIN ANÚNCIOS
+
+  /admin/anuncios/cadastro:
+      post:
+        tags:
+          - "admin"
+        summary: "Cadastro de Anúncios"
+        description: ""
+        operationId: "addAnuncio"
+        consumes:
+          - "application/json"
+          - "multipart/form-data"
+        produces:
+          - "application/json"
+        parameters:
+          - in: "body"
+            name: "Cadastro"
+            description: "Dados do Anúncio"
+            required: false
+            schema:
+                type: "object"
+                properties:
+                  id_empresa:
+                    type: "integer"
+                    example: 35
+                  titulo:
+                    type: "string"
+                    example: "Pizza de Calabresa"
+                  descricao:
+                    type: "string"
+                    example: "Melhor pizza da cidade!"  
+                  regras:
+                    type: "string"
+                    example: "Não existem regras!"  
+                  preco:
+                    type: "float"
+                    example: 50.00
+                  desconto:
+                    type: "integer"
+                    example: 25
+                  vencimento:
+                    type: "string"
+                    example: "2021-05-27 13:59:30"  
+                  quant_tickets:
+                    type: "integer"
+                    example: 20                 
+                required:
+                  - id_empresa
+                  - titulo
+                  - descricao
+                  - regras
+                  - preco
+                  - desconto
+                  - vencimento
+                  - quant_tickets
+          - in: "formData"
+            name: "Banner"
+            description: "Apenas Extensão: image/webp ### Tamanho Máximo: 500 Kilobytes"
+            required: true
+            type: "file"   
+        responses:
+          "201":
+            description: "Anúncio cadastrado com sucesso"
+          "400":
+            description: "Dados inválidos ou não informados"
+          "404":
+            description: "Nenhum registro encontrado"  
+          "500":
+            description: "Erro no servidor" 
+        security:
+        - bearerToken: []        
 
 ## EMPRESAS        
         

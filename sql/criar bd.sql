@@ -4,6 +4,8 @@ use bd_vish_acabou;
 
 alter database bd_vish_acabou charset = utf8mb4 collate = utf8mb4_0900_ai_ci;
 
+-- Empresas
+
 create table tb_status_empresa (
 	id int auto_increment not null primary key,
     status_empresa varchar(30) not null unique
@@ -41,4 +43,29 @@ create table tb_contato_empresa (
     numero varchar(16),
     whatsapp bool,
     constraint FK_empresa foreign key (id_empresa) references tb_empresas(id)
+);
+
+-- Anúncios
+
+create table tb_status_anuncio (
+	id int auto_increment not null primary key,
+    status_anuncio varchar(30) not null unique
+);
+
+create table tb_anuncios (
+	id int auto_increment not null primary key,
+	id_empresa int not null,
+    banner varchar(100) not null,
+    titulo varchar(100) not null,
+    descricao text not null,
+    regras text not null,
+    preco float not null,
+    desconto tinyint unsigned not null,
+    data_inicial datetime default current_timestamp not null,
+    vencimento datetime not null,
+    quant_tickets tinyint unsigned not null,
+    vendidos tinyint unsigned default 0 not null,
+    id_status_anuncio int default 1 not null,
+    constraint FK_empresa foreign key (id_empresa) references tb_empresas (id),
+    constraint FK_status_anuncio foreign key (id_status_anuncio) references tb_status_anuncio (id)
 );

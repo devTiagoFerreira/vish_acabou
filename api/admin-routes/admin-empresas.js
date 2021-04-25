@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
 
 //Controle de rotas
 const empresas = require('../admin-controller/controller-admin-empresas');
