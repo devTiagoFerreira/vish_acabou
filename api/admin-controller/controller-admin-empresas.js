@@ -53,15 +53,6 @@ exports.cadastraEmpresa = (req, res, next) => {
         (estado = req.body.estado || null),
     ];
 
-    if (!func.emailValidator(empresa_obg[0])) {
-        return res.status(400).send({
-            erro: {
-                mensagem: 'O email informado é inválido',
-                email: empresa_obg[0],
-            },
-        });
-    }
-
     for (let i = 0; i < empresa_obg.length; ++i) {
         if (!empresa_obg[i]) {
             return res.status(400).send({
@@ -85,6 +76,15 @@ exports.cadastraEmpresa = (req, res, next) => {
                 },
             });
         }
+    }
+
+    if (!func.emailValidator(empresa_obg[0])) {
+        return res.status(400).send({
+            erro: {
+                mensagem: 'O email informado é inválido',
+                email: empresa_obg[0],
+            },
+        });
     }
 
     //Validador de CNPJ
@@ -461,7 +461,7 @@ exports.reenviaEmail = (req, res, next) => {
         });
 };
 
-//Anativa empresa conforme id fornecido
+//Inativa empresa conforme id fornecido
 exports.inativaEmpresa = (req, res, next) => {
     const id_empresa = req.params.id_empresa;
 
@@ -1039,16 +1039,13 @@ exports.contatos = (req, res, next) => {
                 return res.status(404).send({
                     erro: {
                         status: 404,
-                        mensagem: 'Nenhum contato encontrado.',
+                        mensagem: 'Nenhum contato encontrado',
                     },
                 });
             }
             return res.status(200).send({
-                resposta: {
-                    status: 200,
-                    registros: results.length,
-                    contatos: results,
-                },
+                registros: results.length,
+                contatos: results,
             });
         })
         .catch((error) => {

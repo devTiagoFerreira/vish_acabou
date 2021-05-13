@@ -1,10 +1,10 @@
 #Alterar charset do banco de dados.
 
-alter database vish_acabou charset = utf8mb4 collate = utf8mb4_unicode_ci;
+alter database my_database charset = utf8mb4 collate = utf8mb4_0900_ai_ci;
 
 #Alterar charset das tabelas
 
-alter table tabela convert to character set utf8mb4 collate utf8mb4_unicode_ci;
+alter table  my_table convert to character set utf8mb4 collate utf8mb4_0900_ai_ci;
 
 #Verificar motor das tabelas (MylSAM ou innoDB).
 
@@ -16,4 +16,4 @@ alter table my_table engine = InnoDB or MyISAM;
 
 #Pesquisas case-insensitive
 
-collate utf8mb4_unicode_ci;
+collate utf8mb4_0900_ai_ci;

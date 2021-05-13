@@ -6,10 +6,12 @@ const morgan = require('morgan');
 //Importaçao de rotas
 const routeDoc = require('./routes/doc');
 const routeAdmin = require('./admin');
-const routeEstados = require('./routes/estados');
-const routeCidades = require('./routes/cidades');
-const routeValidador = require('./routes/validador');
 const routeEmpresas = require('./routes/empresas');
+const routeClientes = require('./routes/clientes');
+const routeVendas = require('./routes/vendas');
+const routeCidades = require('./routes/cidades');
+const routeEstados = require('./routes/estados');
+const routeValidador = require('./routes/validador');
 const routeImagens = require('./routes/imagens');
 
 app.use(morgan('dev'));
@@ -31,6 +33,8 @@ app.use((req, res, next) => {
 app.use('/api/docs', routeDoc);
 app.use('/api/admin', routeAdmin);
 app.use('/api/empresas', routeEmpresas);
+app.use('/api/clientes', routeClientes);
+app.use('/api/vendas', routeVendas);
 app.use('/api/cidades', routeCidades);
 app.use('/api/estados', routeEstados);
 app.use('/api/imagens', routeImagens);
