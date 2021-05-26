@@ -866,3 +866,92 @@ exports.excFoto = (req, res, next) => {
             });
         });
 };
+
+//Retorna todas as empresas que o cliente ja comprou
+exports.empresaCompra = (req, res, next) => {
+    const id_cliente = req.usuario.id;
+
+    mysql
+        .poolConnect('select tb_empresas.id as id_empresa, tb_empresas.razao_social as empresa from tb_vendas inner join tb_anuncios on tb_vendas.id_anuncio = tb_anuncios.id inner join tb_empresas on tb_anuncios.id_empresa = tb_empresas.id where tb_vendas.id_cliente = ? group by empresa', [id_cliente])
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    erro: 'Não existe nenhuma compra efetuada',
+                });
+            }
+            return res.status(200).send({
+                resultados: results.length,
+                empresa: results.map((row) => {
+                    return row;
+                }),
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: {
+                    mensagem: error,
+                },
+            });
+        });
+};
+
+//Retorna compras conforme filtros
+exports.compras = (req, res, next) => {
+    const id_cliente = req.usuario.id;
+    const data = new Date();
+    const id_empresa = req.body.id_empresa || '%',
+        data_inicial = req.body.data_inicial || '0000-00-00',
+        data_final = req.body.data_final || data.getFullYear() + '-' + (data.getMonth() + 1) + '-' + data.getDate(),
+        status = req.body.status || '%';
+    mysql
+        .poolConnect(
+            'select tb_vendas.id, tb_vendas.quantidade, tb_vendas.id_anuncio, tb_empresas.id as id_empresa, tb_empresas.razao_social as empresa, tb_vendas.cod_ticket, tb_status_pagamento.status_pagamento, tb_anuncios.titulo as produto, tb_anuncios.preco - (tb_anuncios.preco / 100 * tb_anuncios.desconto) as preco_unitario, tb_vendas.quantidade * (tb_anuncios.preco - (tb_anuncios.preco / 100 * tb_anuncios.desconto)) as preco_total, date_format(tb_vendas.data_compra, "%d/%m/%Y") as data_compra from tb_vendas inner join tb_clientes on tb_vendas.id_cliente = tb_clientes.id inner join tb_anuncios on tb_vendas.id_anuncio = tb_anuncios.id inner join tb_empresas on tb_anuncios.id_empresa = tb_empresas.id inner join tb_status_pagamento on tb_vendas.status_pagamento = tb_status_pagamento.id where tb_clientes.id = ? and tb_empresas.id like ? and (tb_vendas.data_compra between ? and ? + interval 1 day) and tb_vendas.status_pagamento like ?',
+            [id_cliente, id_empresa, data_inicial, data_final, status]
+        )
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    mensagem: 'Nenhum resultado encontrado',
+                });
+            }
+            return res.status(200).send({
+                resultados: results.length,
+                vendas: results.map((row) => {
+                    if (row.status_pagamento == 'Aprovado') {
+                        return {
+                            id_empresa: row.id_empresa,
+                            empresa: row.empresa,
+                            id_venda: row.id_venda,
+                            id_anuncio: row.id_anuncio,
+                            produto: row.produto,
+                            quantidade: row.quantidade,
+                            preco_unitario: row.preco_unitario,
+                            preco_total: row.preco_total,
+                            data_compra: row.data_compra,
+                            ticket: row.cod_ticket,
+                            pagamento: row.status_pagamento,
+                        };
+                    } else {
+                        return {
+                            id_empresa: row.id_empresa,
+                            empresa: row.empresa,
+                            id_venda: row.id_venda,
+                            id_anuncio: row.id_anuncio,
+                            produto: row.produto,
+                            quantidade: row.quantidade,
+                            preco_unitario: row.preco_unitario,
+                            preco_total: row.preco_total,
+                            data_compra: row.data_compra,
+                            ticket: '',
+                            pagamento: row.status_pagamento,
+                        };
+                    }
+                }),
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: error,
+            });
+        });
+};

@@ -36,4 +36,10 @@ router.get('/', auth.clienteAuth, clientes.dados);
 //Deleta foto de perfil
 router.delete('/excluir-foto', auth.clienteAuth, clientes.excFoto);
 
+//Retorna todas as empresas que o cliente ja comprou
+router.get('/compras/empresas', auth.clienteAuth, clientes.empresaCompra);
+
+//Retorna compras conforme filtros
+router.post('/compras/filtros', auth.clienteAuth, clientes.compras);
+
 module.exports = router;

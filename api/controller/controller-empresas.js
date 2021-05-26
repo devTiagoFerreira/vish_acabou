@@ -159,3 +159,33 @@ exports.validarEmail = (req, res, next) => {
             });
     });
 };
+
+//Retorna dados da venda de acordo com o ticket
+exports.ticket = (req, res, next) => {
+    const id_empresa = req.usuario.id,
+        ticket = req.params.ticket;
+
+    mysql
+        .poolConnect('select v.id, date_format(v.data_compra, "%d/%m/%Y") as data_compra, v.quantidade, v.cod_ticket, v.status_entrega, v.id_anuncio, a.titulo, a.banner, c.email, c.nome, c.sobrenome, c.foto from tb_vendas v inner join tb_anuncios a on v.id_anuncio = a.id inner join tb_clientes c on v.id_cliente = c.id where v.cod_ticket = ? and a.id_empresa = ?', [ticket, id_empresa])
+        .then((results) => {
+            if (results.length == 0) {
+                return res.status(404).send({
+                    erro: {
+                        mensagem: 'Ticket inválido',
+                    },
+                });
+            }
+            return res.status(200).send({
+                venda: {
+                    id: results.id,
+                    
+
+                }
+            });
+        })
+        .catch((error) => {
+            return res.status(500).send({
+                erro: error,
+            });
+        });
+};

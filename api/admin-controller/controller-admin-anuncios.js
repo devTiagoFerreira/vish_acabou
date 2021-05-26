@@ -140,7 +140,7 @@ exports.filtroAnuncio = (req, res, next) => {
 
     mysql
         .poolConnect(
-            'select an.id, an.id_empresa, an.banner, an.titulo, an.descricao, an.regras, an.preco, an.desconto, date_format(an.data_inicial, "%d/%m/%Y às %H:%i h") as data_inicial, datediff(an.vencimento, current_date) as dias_restantes,timediff(an.vencimento, current_timestamp) as horas_restantes,an.quant_tickets, an.quant_tickets - an.vendidos as tickets_restantes, an.vendidos,tb_status_anuncio.status_anuncio from tb_anuncios an inner join tb_status_anuncio on an.id_status_anuncio = tb_status_anuncio.id where an.id_empresa like ? and (date_format(an.data_inicial,"%Y-%m-%d") >= ? and date_format(an.data_inicial, "%Y-%m-%d") <= ?) and an.id_status_anuncio like ?;',
+            'select an.id, an.id_empresa, an.banner, an.titulo, an.descricao, an.regras, an.preco, an.desconto, date_format(an.data_inicial, "%d/%m/%Y às %H:%i h") as data_inicial, datediff(an.vencimento, current_date) as dias_restantes,timediff(an.vencimento, current_timestamp) as horas_restantes,an.quant_tickets, an.quant_tickets - an.vendidos as tickets_restantes, an.vendidos,tb_status_anuncio.status_anuncio from tb_anuncios an inner join tb_status_anuncio on an.id_status_anuncio = tb_status_anuncio.id where an.id_empresa like ? and (date_format(an.data_inicial,"%Y-%m-%d") >= ? and date_format(an.data_inicial, "%Y-%m-%d") <= ?) and an.id_status_anuncio like ?',
             [id_empresa, data_inicial, data_final, status]
         )
         .then((results) => {
