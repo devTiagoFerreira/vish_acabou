@@ -20,6 +20,16 @@ securityDefinitions:
 tags:
   - name: "admin"
     description: "Área Administrativa"
+  - name: "admin-empresas"
+    description: "Área Administrativa"
+  - name: "admin-clientes"
+    description: "Área Administrativa"   
+  - name: "admin-anuncios"
+    description: "Área Administrativa"
+  - name: "admin-vendas"
+    description: "Área Administrativa" 
+  - name: "admin-pagamentos"
+    description: "Área Administrativa"         
   - name: "empresas"
     description: "Área Empresarial"
   - name: "clientes"
@@ -90,7 +100,7 @@ paths:
   /admin/empresas/cadastro:
     post:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Cadastro de Empresas"
       description: ""
       operationId: "cadastraEmpresa"
@@ -208,7 +218,7 @@ paths:
   /admin/empresas/filtro:
     post:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Retorna Todas as Empresas Cadastradas de Acordo com os Filtros - Dados Parciais"
       description: ""
       operationId: "filtroEmpresas"
@@ -249,7 +259,7 @@ paths:
   /admin/empresas/{id_empresa}/contatos:
     post:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Adiciona Novos Contatos"
       description: ""
       operationId: "addContatos"
@@ -304,7 +314,7 @@ paths:
   /admin/empresas/reenviar-email:
     post:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Reenvio de Emails"
       description: ""
       operationId: "reenviaEmail"
@@ -340,7 +350,7 @@ paths:
   /admin/empresas/{id_empresa}/inativar:
     patch:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Inativação de Empresas"
       description: ""
       operationId: "inativaEmpresa"
@@ -361,7 +371,7 @@ paths:
   /admin/empresas/{id_empresa}/alterar-email:
     patch:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Altera Email de Empresas"
       description: ""
       operationId: "alteraEmail"
@@ -399,7 +409,7 @@ paths:
   /admin/empresas/{id_empresa}/atualizar-cadastro:
     patch:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Atualiza Cadastro de Empresas"
       description: ""
       operationId: "alteraDadosCadastrais"
@@ -488,7 +498,7 @@ paths:
   /admin/empresas/atualizar-contato/{id_contato}:
     patch:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Atualiza Contato de Empresas"
       description: ""
       operationId: "atualizaContato"
@@ -528,7 +538,7 @@ paths:
   /admin/empresas/{id_empresa}/logo:
     patch:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Atualiza Logo de Empresas"
       description: ""
       operationId: "atualizaLogo"
@@ -557,7 +567,7 @@ paths:
   /admin/empresas:
     get:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Retorna Todas as Empresas Cadastradas - Dados Parciais"
       description: ""
       operationId: "empresas"
@@ -576,7 +586,7 @@ paths:
   /admin/empresas/{id_empresa}:
     get:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Retorna a Empresa Cadastrada de Acordo com o ID - Quase Todos os Dados"
       description: ""
       operationId: "idEmpresas"
@@ -595,7 +605,7 @@ paths:
   /admin/empresas/{id_empresa}/exibir-contatos:
     get:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Retorna Todos os Contatos da Empresa"
       description: ""
       operationId: "contatos"
@@ -614,7 +624,7 @@ paths:
   /admin/empresas/contatos/{id_contato}:
     delete:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Deleta Contato Conforme ID"
       description: ""
       operationId: "deletaContato"
@@ -633,7 +643,7 @@ paths:
   /admin/empresas/{id_empresa}/deleta-logo:
     delete:
       tags:
-        - "admin"
+        - "admin-empresas"
       summary: "Deleta Logo Conforme ID da Empresa Fornecido"
       description: ""
       operationId: "deletaLogo"
@@ -649,12 +659,52 @@ paths:
       security:
         - bearerToken: []
 
+  ## ADMIN CLIENTES 
+  
+  /admin/clientes/{a_partir_de}/{num_linhas}:
+    get:
+      tags:
+        - "admin-clientes"
+      summary: "Retorna Todos os Clientes de Acordo com o Número de Linhas Requisidado"
+      description: ""
+      operationId: "clientes"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Dados retornados"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: []
+
+  /admin/clientes/{id_cliente}:
+    get:
+      tags:
+        - "admin-clientes"
+      summary: "Retorna Cliente Conforme ID"
+      description: ""
+      operationId: "idCliente"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Dados retornados"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: []      
+  
   ## ADMIN ANÚNCIOS
 
   /admin/anuncios/cadastro:
     post:
       tags:
-        - "admin"
+        - "admin-anuncios"
       summary: "Cadastro de Anúncios"
       description: ""
       operationId: "addAnuncio"
@@ -724,7 +774,7 @@ paths:
   /admin/anuncios/filtro:
     post:
       tags:
-        - "admin"
+        - "admin-anuncios"
       summary: "Retorna Todos os Anuncios Conforme Filtros"
       description: ""
       operationId: "filtroAnuncio"
@@ -765,7 +815,7 @@ paths:
   /admin/anuncios/{id_anuncio}/inativar:
     patch:
       tags:
-        - "admin"
+        - "admin-anuncios"
       summary: "Inativa Anúncio"
       description: ""
       operationId: "inativaAnuncio"
@@ -786,7 +836,7 @@ paths:
   /admin/anuncios/{id_anuncio}/ativar:
     patch:
       tags:
-        - "admin"
+        - "admin-anuncios"
       summary: "Ativa Anúncio"
       description: ""
       operationId: "ativaAnuncio"
@@ -807,7 +857,7 @@ paths:
   /admin/anuncios/{id_anuncio}:
     get:
       tags:
-        - "admin"
+        - "admin-anuncios"
       summary: "Retorna Anuncio Conforme ID Fornecido"
       description: ""
       operationId: "retornaAnuncio"
@@ -828,7 +878,7 @@ paths:
   /admin/vendas/filtros:
     post:
       tags:
-        - "admin"
+        - "admin-vendas"
       summary: "Retorna Todas as Vendas Conforme Filtros"
       description: ""
       operationId: "filtroVenda"
@@ -869,7 +919,7 @@ paths:
   /admin/vendas/{id_venda}/negativar:
     patch:
       tags:
-        - "admin"
+        - "admin-vendas"
       summary: "Negativação de Vendas"
       description: ""
       operationId: "negVenda"
@@ -890,7 +940,7 @@ paths:
   /admin/vendas/{id_venda}/aprovar:
     patch:
       tags:
-        - "admin"
+        - "admin-vendas"
       summary: "Aprovação de Vendas"
       description: ""
       operationId: "aprVenda"
@@ -908,6 +958,84 @@ paths:
       security:
         - bearerToken: []       
 
+  ## ADMIN PAGAMENTOS
+
+  /admin/pagamentos/vendas/{id_venda}:
+    patch:
+      tags:
+        - "admin-pagamentos"
+      summary: "Da Baixa em Pendências Conforme ID da Venda"
+      description: ""
+      operationId: "baixaVenda"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Baixa efetuada com sucesso"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: [] 
+  
+  /admin/pagamentos/empresas/{id_empresa}:
+    patch:
+      tags:
+        - "admin-pagamentos"
+      summary: "Da Baixa em Pendências Conforme ID da Venda"
+      description: ""
+      operationId: "baixaVendaEmpresa"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Baixa efetuada com sucesso"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: [] 
+
+  /admin/pagamentos/{id_empresa}:
+    get:
+      tags:
+        - "admin-pagamentos"
+      summary: "Retorna as Pendências de Pagamento Conforme o ID da Empresa Fornecido"
+      description: ""
+      operationId: "pagamentosEmpresa"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Dados retornados"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: []
+
+  /admin/pagamentos:
+    get:
+      tags:
+        - "admin-pagamentos"
+      summary: "Retorna Todas as Pendências de Pagamento"
+      description: ""
+      operationId: "pagamentos"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Dados retornados"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: []
+               
   ## EMPRESAS
 
   /empresas/login:
@@ -989,7 +1117,138 @@ paths:
         "500":
           description: "Erro no servidor"
       security:
+        - bearerToken: []    
+
+  /empresas/anuncios/filtros:
+    post:
+      tags:
+        - "empresas"
+      summary: "Retorna Todos os Anuncios Conforme Filtros"
+      description: ""
+      operationId: "filtroAnuncio"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "Filtros"
+          description: "Parâmetros"
+          required: false
+          schema:
+            type: "object"
+            properties:
+              data_inicial:
+                type: "string"
+                example: "2021-05-29"
+              data_final:
+                type: "string"
+                example: "2021-05-29"  
+              status:
+                type: "integer"
+                example: 2  
+      responses:
+        "200":
+          description: "Dados retornados"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: []  
+
+  /empresas/anuncios/{id_anuncio}:
+    get:
+      tags:
+        - "empresas"
+      summary: "Retorna Anúncio Conforme ID Fornecido"
+      description: ""
+      operationId: "retornaAnuncio"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Dados retornados"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
         - bearerToken: []
+
+  /empresas/vendas/filtros:
+    post:
+      tags:
+        - "empresas"
+      summary: "Retorna Vendas Conforme Filtros"
+      description: ""
+      operationId: "filtroVenda"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "Filtros"
+          description: "Parâmetros"
+          required: false
+          schema:
+            type: "object"
+            properties:
+              data_inicial:
+                type: "string"
+                example: "2021-05-29"
+              data_final:
+                type: "string"
+                example: "2021-05-29"  
+              status_pagamento:
+                type: "boolean"
+                example: false   
+      responses:
+        "200":
+          description: "Dados retornados"
+        "404":
+          description: "Nenhum registro encontrado"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: []       
+  
+  /empresas/vendas/{ticket}:
+    get:
+      tags:
+        - "empresas"
+      summary: "Retorna Dados da Venda de Acordo com o Ticket"
+      description: ""
+      operationId: "ticket"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Dados retornados"
+        "400":
+          description: "Dados inválidos ou não informados"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: []
+
+  /empresas/vendas/receber:
+    get:
+      tags:
+        - "empresas"
+      summary: "Retorna Total a Receber"
+      description: ""
+      operationId: "totalReceber"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Dados retornados"
+        "500":
+          description: "Erro no servidor"
+      security:
+        - bearerToken: [] 
 
   ## CLIENTES
 
@@ -1764,3 +2023,4 @@ paths:
           description: "Inscrição Estadual válida"
         "400":
           description: "Inscrição Estadual inválida"
+

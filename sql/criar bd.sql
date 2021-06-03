@@ -34,7 +34,7 @@ create table tb_empresas (
 	id_status_empresa int default 1 not null,
     constraint FK_status_empresa foreign key (id_status_empresa) references tb_status_empresa (id),
     constraint FK_cidade foreign key (cidade) references tb_cidades (id),
-    constraint FK_status_empresa foreign key (estado) references tb_estados (id)
+    constraint FK_estado foreign key (estado) references tb_estados (id)
 );
 
 create table tb_contato_empresa (
@@ -66,7 +66,7 @@ create table tb_anuncios (
     quant_tickets tinyint unsigned not null,
     vendidos tinyint unsigned default 0 not null,
     id_status_anuncio int default 1 not null,
-    constraint FK_empresa foreign key (id_empresa) references tb_empresas (id),
+    constraint FK_id_empresa foreign key (id_empresa) references tb_empresas (id),
     constraint FK_status_anuncio foreign key (id_status_anuncio) references tb_status_anuncio (id)
 );
 
@@ -116,4 +116,24 @@ create table tb_vendas (
     constraint FK_anuncio foreign key (id_anuncio) references tb_anuncios (id),
     constraint FK_cliente foreign key (id_cliente) references tb_clientes (id),
     constraint FK_status_pagamento foreign key (status_pagamento) references tb_status_pagamento (id)
+);
+
+-- Admin
+
+create table tb_admin (
+	id int auto_increment not null primary key,
+	email varchar(50) not null unique,
+	senha varchar(100) not null,
+	foto varchar(100),
+	nome varchar(50) not null,
+	sobrenome varchar(100) not null,
+	data_nasc date,
+	data_cadastro datetime default current_timestamp not null
+);
+
+-- Comissão
+
+create table tb_comissao (
+	id int primary key auto_increment,
+    comissao int not null
 );

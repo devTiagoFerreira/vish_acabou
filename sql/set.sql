@@ -18,3 +18,11 @@ insert into tb_status_cliente values
 insert into tb_status_pagamento values 
 (0, 'Aguardando aprovação'), (0, 'Negado'), (0, 'Aprovado');
 
+-- Comissão Vendas
+
+insert into tb_comissao values 
+(0, 5);
+
+-- Admin
+
+insert into tb_admin values (0, 'vishacabou@vishacabou.com.br','$2b$10$vfoS1N16cNFkiNGr3nZiOOR5M5JCYCGUJPeVk90e0/81e1ci6FeiO', null, 'Vish', 'Acabou', '2021/06/03', default);

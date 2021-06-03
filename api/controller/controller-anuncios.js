@@ -36,7 +36,6 @@ exports.anuncios = (req, res, next) => {
 };
 
 //Retorna anúncio conforme id
-
 exports.idAnuncio = (req, res, next) => {
     const id_anuncio = req.params.id_anuncio;
     mysql

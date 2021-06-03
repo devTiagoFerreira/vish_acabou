@@ -42,6 +42,7 @@ app.use('/api/estados', routeEstados);
 app.use('/api/imagens', routeImagens);
 app.use('/api/validador', routeValidador);
 
+
 app.use((req, res, next) => {
     const erro = new Error('Rota não encontrada');
     erro.status = 404;
